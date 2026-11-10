@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0E1116">
+<title>Gringotts</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+  html, body { margin: 0; height: 100%; background: #0E1116; color: #E6EDF3; font: 16px/1.5 system-ui, sans-serif; }
+  iframe { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; }
+  #splash { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; background: #0E1116; transition: opacity .3s; }
+  #splash img { width: 112px; height: 112px; border-radius: 26px; }
+  #splash span { color: #D4A537; font: 500 1.1rem Georgia, serif; letter-spacing: .08em; }
+  #splash.gone { opacity: 0; pointer-events: none; }
+  #splash[hidden] { display: none; }
+  .logo { width: 72px; height: 72px; border-radius: 18px; display: block; margin-bottom: 16px; }
+  main { max-width: 28rem; margin: 0 auto; padding: 48px 16px; }
+  h1 { font-size: 1.4rem; margin: 0 0 8px; }
+  p { color: #9AA4AF; margin: 0 0 16px; }
+  label { display: block; margin-bottom: 6px; }
+  input { box-sizing: border-box; width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #2A313A; background: #161B22; color: inherit; font: inherit; }
+  input:focus-visible, button:focus-visible { outline: 2px solid #4FD1A5; outline-offset: 2px; }
+  button { margin-top: 12px; width: 100%; min-height: 48px; border: 0; border-radius: 10px; background: #4FD1A5; color: #0E1116; font: 600 1rem system-ui, sans-serif; }
+  .err { color: #F28B82; min-height: 1.5em; margin: 8px 0 0; }
+</style>
+</head>
+<body>
+<!-- This page is public: it holds no link, secret or data. Each phone keeps its own app link in this browser's storage. -->
+<div id="splash" hidden><img src="logo.svg" alt=""><span>Gringotts</span></div>
+<main id="setup" hidden>
+  <img class="logo" src="icon-192.png" alt="">
+  <h1>Gringotts</h1>
+  <p>Paste your personal app link once. It stays on this phone only. To change it later, long-press the app icon and pick Change link.</p>
+  <form id="f">
+    <label for="link">App link</label>
+    <input id="link" type="url" inputmode="url" autocomplete="off" placeholder="https://…" required>
+    <p class="err" id="err" role="alert"></p>
+    <button type="submit">Open</button>
+  </form>
+</main>
+<script>
+  var KEY = 'expenseAppLink';
+  function saved() { try { return localStorage.getItem(KEY) || ''; } catch (e) { return ''; } }
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function () {});
+  var link = saved();
+  if (link && !/[?&]change\b/.test(location.search)) {
+    var fr = document.createElement('iframe');
+    fr.src = link; fr.title = 'Gringotts';
+    fr.allow = 'clipboard-read; clipboard-write';
+    var sp = document.getElementById('splash');
+    sp.hidden = false;   // vault wheel spins until the app has loaded
+    fr.addEventListener('load', function () { sp.classList.add('gone'); setTimeout(function () { sp.remove(); }, 400); });
+    document.body.insertBefore(fr, sp);
+  } else {
+    document.getElementById('setup').hidden = false;
+    var inp = document.getElementById('link');
+    inp.value = link;
+    document.getElementById('f').addEventListener('submit', function (e) {
+      e.preventDefault();
+      var v = inp.value.trim();
+      if (!/^https:\/\/[^\s]+$/.test(v)) { document.getElementById('err').textContent = 'The link must start with https://'; return; }
+      try { localStorage.setItem(KEY, v); } catch (err) { document.getElementById('err').textContent = 'This browser would not save the link.'; return; }
+      location.replace(location.pathname);
+    });
+  }
+</script>
+</body>
+</html>

@@ -36,7 +36,7 @@
   #splash .door-wrap { width: min(46vw, 200px); height: min(46vw, 200px); }
   #splash .door svg { display: block; width: 100%; height: 100%; }
   #splash.unlock .bolts { transition: transform .45s cubic-bezier(.3,0,.2,1); transform: scale(.9); }   /* bolts pull in */
-  #splash.open { animation: fade .45s ease-in .4s forwards; pointer-events: none; }
+  #splash.open { animation: fade .4s ease-in .2s forwards; pointer-events: none; }
   @keyframes fade { to { opacity: 0; } }
   @media (prefers-reduced-motion: reduce) { #splash.open { animation-delay: 0s; } }
 
@@ -108,9 +108,10 @@
       sp.classList.add('unlock');   // the wheel stops where it is, the bolts pull in, then the app fades in
       if (wheel) wheel.style.animationPlayState = 'paused';
       sp.classList.add('open');
-      setTimeout(function () { sp.remove(); }, still ? 500 : 900);
+      setTimeout(function () { sp.remove(); }, still ? 450 : 650);
     };
-    var ready = function () { setTimeout(open, Math.max(0, 3200 - (Date.now() - shown))); };   // at least a right and a left turn first
+    var ready = function () { setTimeout(open, Math.max(0, 1500 - (Date.now() - shown))); };   // at least a right and a left turn first (1.5 s)
+    setTimeout(open, 2400);   // never longer than about 3 s with the fade, even while the app is still loading
     sp.addEventListener('click', open);   // tap to skip
     if (demo) setTimeout(ready, 2500);
     else {

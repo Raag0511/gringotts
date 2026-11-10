@@ -81,6 +81,17 @@
 <script>
   var KEY = 'expenseAppLink';
   function saved() { try { return localStorage.getItem(KEY) || ''; } catch (e) { return ''; } }
+  // The screen a link asks for (e.g. ?tab=cards from the 8 am email). Only these values are passed on to the app.
+  function asked() {
+    var q = new URLSearchParams(location.search), out = new URLSearchParams(), t = (q.get('tab') || '').toLowerCase();
+    if (/^(home|activity|tag|insights|cards|friends|cash)$/.test(t)) out.set('tab', t);
+    ['row', 'c'].forEach(function (k) { var v = q.get(k) || ''; if (/^\d{1,6}$/.test(v)) out.set(k, v); });
+    return out;
+  }
+  // The saved app link with the asked-for screen added; replaces any screen already in it, keeps everything else.
+  function withScreen(link, q) {
+    try { var u = new URL(link); q.forEach(function (v, k) { u.searchParams.set(k, v); }); return u.href; } catch (e) { return link; }
+  }
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function () {});
   var link = saved();
   var demo = /[?&]demo\b/.test(location.search);   // ?demo: plays the opening with a pretend 2.5 s load, no app
@@ -104,7 +115,7 @@
     if (demo) setTimeout(ready, 2500);
     else {
       var fr = document.createElement('iframe');
-      fr.src = link; fr.title = 'Gringotts';
+      fr.src = withScreen(link, asked()); fr.title = 'Gringotts';
       fr.allow = 'clipboard-read; clipboard-write';
       fr.addEventListener('load', ready);
       document.body.insertBefore(fr, sp);
@@ -119,7 +130,8 @@
       var v = inp.value.trim();
       if (!/^https:\/\/[^\s]+$/.test(v)) { document.getElementById('err').textContent = 'The link must start with https://'; return; }
       try { localStorage.setItem(KEY, v); } catch (err) { document.getElementById('err').textContent = 'This browser would not save the link.'; return; }
-      location.replace(location.pathname);
+      var q = asked().toString();   // keep the screen the first link asked for
+      location.replace(location.pathname + (q ? '?' + q : ''));
     });
   }
 </script>

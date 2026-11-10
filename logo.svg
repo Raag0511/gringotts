@@ -24,7 +24,7 @@
     </g>
     <style>
       .wheel, .bolts { transform-origin: 50px 50px; }
-      @media (prefers-reduced-motion: no-preference) { .wheel { animation: combo 3s ease-in-out infinite; } }
+      @media (prefers-reduced-motion: no-preference) { .wheel { animation: combo 5.5s ease-in-out infinite; } }
       @keyframes combo { 30% { transform: rotate(220deg); } 55% { transform: rotate(40deg); } 78% { transform: rotate(160deg); } 100% { transform: rotate(0deg); } }   /* right, left, right, left */
     </style>
   </defs>

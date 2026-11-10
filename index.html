@@ -99,7 +99,7 @@
       sp.classList.add('open');
       setTimeout(function () { sp.remove(); }, still ? 500 : 900);
     };
-    var ready = function () { setTimeout(open, Math.max(0, 3000 - (Date.now() - shown))); };   // one full combination first
+    var ready = function () { setTimeout(open, Math.max(0, 3200 - (Date.now() - shown))); };   // at least a right and a left turn first
     sp.addEventListener('click', open);   // tap to skip
     if (demo) setTimeout(ready, 2500);
     else {

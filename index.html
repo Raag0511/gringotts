@@ -84,7 +84,7 @@
   // The screen a link asks for (e.g. ?tab=cards from the 8 am email). Only these values are passed on to the app.
   function asked() {
     var q = new URLSearchParams(location.search), out = new URLSearchParams(), t = (q.get('tab') || '').toLowerCase();
-    if (/^(home|activity|tag|insights|cards|friends|cash)$/.test(t)) out.set('tab', t);
+    if (/^(home|activity|tag|insights|cards|friends|cash|books)$/.test(t)) out.set('tab', t);
     // 'card' opens a card (7.26). Older emails said 'c', which Google keeps for itself and refuses: sent on as 'card'.
     [['row', 'row'], ['card', 'card'], ['c', 'card']].forEach(function (k) { var v = q.get(k[0]) || ''; if (/^\d{1,6}$/.test(v)) out.set(k[1], v); });
     return out;

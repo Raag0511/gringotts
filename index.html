@@ -18,10 +18,10 @@
 
   /* the vault: shared by the opening screen and the setup screen */
   .vault { display: flex; flex-direction: column; align-items: center; text-align: center; }
-  .door-wrap { position: relative; }
+  .door-wrap { position: relative; perspective: 700px; }
   .door-wrap::before { content: ""; position: absolute; inset: -30%; border-radius: 50%;
     background: radial-gradient(closest-side, rgba(226,181,76,.22), rgba(226,181,76,0)); }
-  .door { position: relative; display: block; width: 100%; height: 100%; }
+  .door { position: relative; display: block; width: 100%; height: 100%; z-index: 2; transform-origin: 14.5% 50%; }   /* hinges on the left */
   .word { margin: 22px 0 0; font: 800 clamp(1.7rem, 7vw, 2.4rem)/1 Cinzel, Georgia, serif; letter-spacing: .2em; padding-left: .2em;
     background: linear-gradient(180deg, var(--gold-hi), var(--gold) 55%, var(--gold-lo)); -webkit-background-clip: text; background-clip: text; color: transparent;
     filter: drop-shadow(0 1px 0 #3E2E0C) drop-shadow(0 2px 3px rgba(0,0,0,.45)); }   /* carved into stone */
@@ -31,14 +31,68 @@
   .rule i { width: 6px; height: 6px; background: var(--gold); transform: rotate(45deg); }
   .tag { margin: 12px 0 0; font: 400 .78rem Cinzel, Georgia, serif; letter-spacing: .28em; padding-left: .28em; color: var(--muted); }
 
-  #splash { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: var(--bg); }
+  /* ---- the opening ---- */
+  #splash { position: fixed; inset: 0; background: radial-gradient(90% 55% at 50% 42%, #173a31 0%, var(--bg) 62%); cursor: pointer; outline: none; z-index: 5; }
   #splash[hidden] { display: none; }
-  #splash .door-wrap { width: min(46vw, 200px); height: min(46vw, 200px); }
-  #splash .door svg { display: block; width: 100%; height: 100%; }
-  #splash.unlock .bolts { transition: transform .45s cubic-bezier(.3,0,.2,1); transform: scale(.9); }   /* bolts pull in */
-  #splash.open { animation: fade .4s ease-in .2s forwards; pointer-events: none; }
-  @keyframes fade { to { opacity: 0; } }
-  @media (prefers-reduced-motion: reduce) { #splash.open { animation-delay: 0s; } }
+  .front { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; transition: opacity .5s; }
+  #splash .door-wrap { width: min(56vw, 240px); height: min(56vw, 240px); }   /* the mockup's size */
+  #splash .door-wrap::before { animation: breathe 2.6s ease-in-out infinite; }
+  @keyframes breathe { 50% { opacity: .55; transform: scale(.94); } }
+  #splash .door svg, #splash .door img { display: block; width: 100%; height: 100%; }
+  .wheel, .bolts { transform-origin: 50px 50px; }
+  .glow { position: absolute; inset: 6%; border-radius: 50%; opacity: 0; transform: scale(.6);
+    background: radial-gradient(circle, #fff6d6 0%, var(--gold-hi) 30%, rgba(226,181,76,0) 70%); }
+  /* the goblin in the doorway: spectacles pushed up, a blink, a small formal bow */
+  .popgob { position: absolute; left: 12%; top: 8%; width: 76%; z-index: 1; opacity: 0; transform: translateY(34%) scale(.6);
+    transition: transform .5s cubic-bezier(.3,1.5,.5,1), opacity .2s; }
+  .popgob .headg, .popgob .arm, .popgob .lids, .popgob .bodyg { transform-box: fill-box; }
+  .popgob .headg { transform-origin: 50% 100%; }
+  .popgob .lids { transform-origin: 50% 0; transform: scaleY(0); }
+  .popgob .arm { transform: translate(0, 32px); }
+  #splash.unlock .wheel { animation-play-state: paused; }
+  #splash.unlock .bolts { transition: transform .4s cubic-bezier(.3,0,.2,1); transform: scale(.9); }   /* bolts pull in */
+  #splash.swing .door { transition: transform .55s cubic-bezier(.55,0,.25,1); transform: rotateY(-104deg); }   /* the door swings back */
+  #splash.swing .glow { transition: opacity .25s, transform .6s ease-out; opacity: 1; transform: scale(1.9); }
+  #splash.deep .glow { transition: opacity .25s, transform .9s ease-in; transform: scale(6); }
+  #splash.pop .popgob { opacity: 1; transform: none; }
+  #splash.pop .popgob .arm { animation: specs 1s ease-in-out .3s both; }
+  #splash.pop .popgob .glint { animation: glint .45s ease .72s 1; }
+  #splash.pop .popgob .lids { animation: lid .22s ease 1.05s 1; }
+  #splash.pop .popgob .headg { animation: bow .7s ease-in-out 1.25s both; }
+  #splash.pop .popgob .bodyg { animation: bowb .7s ease-in-out 1.25s both; }
+  @keyframes specs { 0% { transform: translate(0,32px); } 38%, 56% { transform: translate(-7.5px,-7.5px); } 100% { transform: translate(0,32px); } }
+  @keyframes glint { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
+  @keyframes lid { 50% { transform: scaleY(1); } }
+  @keyframes bow { 45% { transform: translateY(5px) scaleY(.93) rotate(-2deg); } }
+  @keyframes bowb { 45% { transform: translateY(2px); } }
+
+  /* the vault room: first or slow load */
+  .vroom { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; opacity: 0; transition: opacity .6s; pointer-events: none; }
+  .vroom .mini { font: 800 clamp(1.1rem, 5vw, 1.4rem)/1 Cinzel, Georgia, serif; letter-spacing: .22em; padding-left: .22em; color: var(--gold); }
+  .vroom .rule { margin: 8px 0 0; width: min(170px, 46vw); }
+  .vroom .mtag { font: 400 .68rem Cinzel, Georgia, serif; letter-spacing: .28em; padding-left: .28em; color: var(--muted); margin: 8px 0 6px; }
+  .vroom svg { width: min(92vw, 380px); overflow: visible; }
+  .vroom .quill { transform-box: fill-box; transform-origin: 10% 90%; animation: scribble .3s ease-in-out infinite alternate; }
+  .vroom .head { transform-box: fill-box; transform-origin: 50% 90%; animation: nod 3.2s ease-in-out infinite; }
+  .vroom .rglint { animation: glint 3s ease 1s infinite; }
+  .vroom .ink { stroke-dasharray: 40; stroke-dashoffset: 40; animation: ink 2.4s linear infinite; }
+  .vroom .ink:nth-of-type(2) { animation-delay: .8s; } .vroom .ink:nth-of-type(3) { animation-delay: 1.6s; }
+  .vroom .stampg { transform-box: fill-box; transform-origin: center; transform: scale(2.4) rotate(-10deg); opacity: 0; transition: transform .28s cubic-bezier(.5,1.6,.6,1), opacity .12s; }
+  @keyframes scribble { from { transform: rotate(-7deg); } to { transform: rotate(6deg) translateX(2px); } }
+  @keyframes nod { 0%, 60%, 100% { transform: none; } 70% { transform: rotate(-5deg); } 85% { transform: rotate(3deg); } }
+  @keyframes ink { 0% { stroke-dashoffset: 40; } 40%, 100% { stroke-dashoffset: 0; } }
+  #splash.room .front { opacity: 0; }
+  #splash.room .vroom { opacity: 1; }
+  #splash.stamp .stampg { opacity: 1; transform: scale(1) rotate(-10deg); }
+  #splash.stamp .quill, #splash.stamp .ink { animation-play-state: paused; }
+  .status { position: absolute; left: 0; right: 0; bottom: max(8.5%, 40px); text-align: center; font: 500 .72rem ui-monospace, Consolas, monospace; color: var(--muted); opacity: 0; transition: opacity .3s; padding: 0 20px; }
+  .status.on { opacity: 1; }
+  .skip { position: absolute; right: 16px; bottom: max(16px, env(safe-area-inset-bottom)); font: 500 .7rem ui-monospace, Consolas, monospace; letter-spacing: .08em; color: rgba(169,160,138,.55); }
+  #splash.open { transition: opacity .35s ease-in; opacity: 0; pointer-events: none; }
+  @media (prefers-reduced-motion: reduce) {
+    .wheel, .vroom *, .popgob, .popgob * { animation: none !important; }
+    #splash .door, #splash .glow, .popgob, .front, .vroom, #splash.open { transition: none !important; }
+  }
 
   main { max-width: 26rem; margin: 0 auto; padding: max(48px, 8vh) 16px 32px; }
   main .door-wrap { width: 112px; height: 112px; }
@@ -46,7 +100,7 @@
   label { display: block; margin-bottom: 6px; font-size: .9rem; color: var(--text); }
   .hint { color: var(--muted); font-size: .9rem; margin: 0 0 20px; text-align: center; }
   input { box-sizing: border-box; width: 100%; min-height: 48px; padding: 12px; border-radius: 10px; border: 1px solid #2C4A41; background: #12302A; color: inherit; font: inherit; }
-  input:focus-visible, button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+  input:focus-visible, button:focus-visible, #splash:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
   button { margin-top: 12px; width: 100%; min-height: 48px; border: 0; border-radius: 10px; color: #2A1E05; cursor: pointer;
     background: linear-gradient(180deg, var(--gold-hi), var(--gold)); font: 600 .95rem Cinzel, Georgia, serif; letter-spacing: .14em; }
   .err { color: #F28B82; min-height: 1.5em; margin: 8px 0 0; font-size: .9rem; }
@@ -54,15 +108,105 @@
 </head>
 <body>
 <!-- This page is public: it holds no link, secret or data. Each phone keeps its own app link in this browser's storage. -->
-<div id="splash" hidden>
-  <div class="vault">
-    <div class="door-wrap">
-      <div class="door"><img src="logo.svg" alt="" style="width:100%;height:100%"></div>
+<div id="splash" role="button" tabindex="0" aria-label="Opening Gringotts. Tap to skip" hidden>
+  <div class="front">
+    <div class="vault">
+      <div class="door-wrap">
+        <div class="glow"></div>
+        <!-- the goblin who opens the door (original drawing) -->
+        <svg class="popgob" viewBox="0 0 100 100" aria-hidden="true">
+          <defs><linearGradient id="gskin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#729470"/><stop offset="1" stop-color="#4f6f4c"/></linearGradient></defs>
+          <g class="bodyg">
+            <path d="M14 100 Q18 80 50 76 Q82 80 86 100 Z" fill="#1c2620"/>
+            <path d="M40 78 L50 100 L60 78 Z" fill="#6b4f22"/>
+            <path d="M40 78 L35 94 L46 86 Z M60 78 L65 94 L54 86 Z" fill="#141c17"/>
+            <path d="M42 77 L50 85 L58 77 L54 74 L50 78 L46 74 Z" fill="#EADBB8"/>
+            <circle cx="50" cy="90" r="1.3" fill="#E2B54C"/><circle cx="50" cy="96" r="1.3" fill="#E2B54C"/>
+            <path d="M51 91 Q56 96 59 92" stroke="#E2B54C" stroke-width=".9" fill="none"/><circle cx="59.5" cy="92" r="1.6" fill="#E2B54C"/>
+          </g>
+          <g class="headg">
+            <path d="M31 52 Q15 38 3 27 Q19 30 35 59 Z" fill="#5d7f59"/><path d="M29 51 Q17 40 10 32 Q21 36 32 56 Z" fill="#c98f7a" opacity=".4"/>
+            <path d="M69 52 Q85 38 97 27 Q81 30 65 59 Z" fill="#5d7f59"/><path d="M71 51 Q83 40 90 32 Q79 36 68 56 Z" fill="#c98f7a" opacity=".4"/>
+            <path d="M50 30 C65 30 74 42 73 56 C72 68 63 77 50 77 C37 77 28 68 27 56 C26 42 35 30 50 30 Z" fill="url(#gskin)"/>
+            <path d="M40 37.5 Q50 34.5 60 37.5 M42.5 41 Q50 39 57.5 41" stroke="#3e5a3b" stroke-width=".8" fill="none"/>
+            <path d="M36 46 L46 48.5 M64 46 L54 48.5" stroke="#22301f" stroke-width="2.3" stroke-linecap="round"/>
+            <ellipse cx="43" cy="53" rx="3.3" ry="2.5" fill="#f3ead0"/><ellipse cx="57" cy="53" rx="3.3" ry="2.5" fill="#f3ead0"/>
+            <circle cx="43.6" cy="53.3" r="1.6" fill="#1a1208"/><circle cx="57.6" cy="53.3" r="1.6" fill="#1a1208"/>
+            <g class="lids"><ellipse cx="43" cy="53" rx="3.8" ry="3" fill="#5d7f59"/><ellipse cx="57" cy="53" rx="3.8" ry="3" fill="#5d7f59"/></g>
+            <circle cx="43" cy="53" r="6" fill="#fbe3a0" fill-opacity=".14" stroke="#E2B54C" stroke-width="1.5"/>
+            <circle cx="57" cy="53" r="6" fill="#fbe3a0" fill-opacity=".14" stroke="#E2B54C" stroke-width="1.5"/>
+            <path d="M49 53 h2 M37 52 L31 50 M63 52 L69 50" stroke="#E2B54C" stroke-width="1.1"/>
+            <path class="glint" d="M53 48.5 l3.5 3.5 M60 48 l-1.5 1.5" stroke="#fff6d8" stroke-width="1.5" stroke-linecap="round" opacity="0"/>
+            <path d="M50 54 C55 58 57.5 64 52.5 67 C50.5 68 48 66.5 49 63 Z" fill="#4c6b4a"/>
+            <path d="M38 62 q2 4 5 6 M62 62 q-2 4 -5 6" stroke="#3e5a3b" stroke-width=".8" fill="none"/>
+            <path d="M43 70.5 Q50 73.5 58 69.5" stroke="#22301f" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+          </g>
+          <g class="arm">
+            <path d="M73 104 Q74 88 67 77" stroke="#2c3a32" stroke-width="6.5" fill="none" stroke-linecap="round"/><path d="M68.5 78.5 L64.5 75.5" stroke="#EADBB8" stroke-width="3" stroke-linecap="round"/>
+            <ellipse cx="65" cy="72" rx="4.2" ry="3.5" fill="#5d7f59"/>
+            <path d="M63.5 70 L58.5 61.5" stroke="#5d7f59" stroke-width="2.2" stroke-linecap="round"/>
+            <path d="M66.5 69.5 L64 64" stroke="#4f6f4c" stroke-width="2" stroke-linecap="round"/>
+          </g>
+        </svg>
+        <div class="door"><img src="logo.svg" alt=""></div>
+      </div>
+      <p class="word">Gringotts</p>
+      <div class="rule"><i></i></div>
+      <p class="tag">Goblins at Work</p>
     </div>
-    <p class="word">Gringotts</p>
-    <div class="rule"><i></i></div>
-    <p class="tag">Goblins at Work</p>
   </div>
+
+  <!-- the vault room: a goblin writing in his ledger while coins land on his stacks (original drawing) -->
+  <div class="vroom" aria-hidden="true">
+    <div class="mini">Gringotts</div>
+    <div class="rule"><i></i></div>
+    <div class="mtag">Goblins at Work</div>
+    <svg viewBox="0 0 300 300">
+      <defs><radialGradient id="rg" cx="50%" cy="55%" r="55%"><stop offset="0" stop-color="#f1d68a" stop-opacity=".45"/><stop offset="1" stop-color="#f1d68a" stop-opacity="0"/></radialGradient></defs>
+      <path d="M28 300 V110 Q28 22 150 22 Q272 22 272 110 V300 Z" fill="#12302A" stroke="#9C7424" stroke-width="2"/>
+      <ellipse cx="150" cy="170" rx="125" ry="115" fill="url(#rg)"/>
+      <g stroke="#3a2a12" stroke-width="5"><path d="M48 92 H252"/><path d="M48 138 H252"/></g>
+      <g fill="#E2B54C" stroke="#7a5a1c" stroke-width=".8">
+        <rect x="58" y="78" width="14" height="4" rx="2"/><rect x="58" y="74" width="14" height="4" rx="2"/><rect x="59" y="70" width="14" height="4" rx="2"/>
+        <rect x="78" y="78" width="14" height="4" rx="2"/><rect x="78" y="74" width="14" height="4" rx="2"/>
+        <rect x="206" y="78" width="14" height="4" rx="2"/><rect x="207" y="74" width="14" height="4" rx="2"/><rect x="206" y="70" width="14" height="4" rx="2"/><rect x="206" y="66" width="14" height="4" rx="2"/>
+        <rect x="228" y="78" width="14" height="4" rx="2"/>
+        <rect x="62" y="124" width="14" height="4" rx="2"/><rect x="224" y="124" width="14" height="4" rx="2"/><rect x="224" y="120" width="14" height="4" rx="2"/>
+      </g>
+      <g fill="#5a3f1a"><rect x="100" y="112" width="26" height="22" rx="2"/><rect x="176" y="116" width="22" height="18" rx="2"/></g>
+      <g fill="#E2B54C"><rect x="111" y="120" width="4" height="5"/><rect x="185" y="122" width="4" height="5"/></g>
+      <g transform="translate(50 128)">
+        <path d="M62 62 L14 38 L58 80 Z" fill="#4c6b4a"/><path d="M138 62 L186 38 L142 80 Z" fill="#4c6b4a"/>
+        <path d="M58 118 Q100 92 142 118 L148 140 L52 140 Z" fill="#1f2a24"/>
+        <circle cx="100" cy="112" r="1.8" fill="#E2B54C"/><circle cx="100" cy="120" r="1.8" fill="#E2B54C"/>
+        <g class="head">
+          <ellipse cx="100" cy="70" rx="40" ry="38" fill="#5d7f59"/>
+          <path d="M100 68 Q114 86 102 96 Q96 92 98 84 Z" fill="#4c6b4a"/>
+          <path d="M74 56 L92 60 M126 56 L108 60" stroke="#22301f" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="85" cy="68" r="9" fill="#fbe3a0" fill-opacity=".18" stroke="#E2B54C" stroke-width="2"/>
+          <circle cx="115" cy="68" r="9" fill="#fbe3a0" fill-opacity=".18" stroke="#E2B54C" stroke-width="2"/>
+          <path d="M94 68 L106 68" stroke="#E2B54C" stroke-width="2"/>
+          <circle cx="86" cy="71" r="2.4" fill="#0E2620"/><circle cx="114" cy="71" r="2.4" fill="#0E2620"/>
+          <path class="rglint" d="M110 62 l4 4" stroke="#fff6d8" stroke-width="2" stroke-linecap="round" opacity="0"/>
+          <path d="M90 102 Q100 98 110 102" stroke="#22301f" stroke-width="2" fill="none" stroke-linecap="round"/>
+        </g>
+        <rect x="14" y="136" width="172" height="34" rx="3" fill="#4a3519"/>
+        <path d="M54 131 L100 125 L146 131 L146 141 L54 141 Z" fill="#EADBB8"/>
+        <path d="M100 125 L100 141" stroke="#b9a983" stroke-width="1"/>
+        <g stroke="#6b5a3a" stroke-width="1.1" fill="none"><path class="ink" d="M106 130 h32"/><path class="ink" d="M106 133.5 h28"/><path class="ink" d="M106 137 h32"/></g>
+        <path d="M62 131 h28 M62 134.5 h22 M62 138 h26" stroke="#9c8c6a" stroke-width="1"/>
+        <g fill="#E2B54C" stroke="#7a5a1c" stroke-width=".8">
+          <rect x="24" y="128" width="18" height="4" rx="2"/><rect x="24" y="124" width="18" height="4" rx="2"/><rect x="25" y="120" width="18" height="4" rx="2"/><rect x="24" y="116" width="18" height="4" rx="2"/>
+          <rect x="158" y="128" width="18" height="4" rx="2"/><rect x="159" y="124" width="18" height="4" rx="2"/>
+        </g>
+        <g id="coins" fill="#FBE3A0" stroke="#7a5a1c" stroke-width=".8"></g>
+        <g class="quill"><path d="M140 132 L164 92 Q170 86 168 98 L144 134 Z" fill="#EADBB8"/><circle cx="141" cy="132" r="5.5" fill="#5d7f59"/></g>
+        <g class="stampg"><rect x="66" y="122" width="60" height="18" rx="2" fill="rgba(192,57,43,.12)" stroke="#c0392b" stroke-width="2"/><text x="96" y="135" text-anchor="middle" font-family="Cinzel,serif" font-weight="800" font-size="10" fill="#c0392b" letter-spacing="1.5">ENTERED</text></g>
+      </g>
+    </svg>
+  </div>
+  <p class="status" id="status" aria-live="polite"></p>
+  <span class="skip">tap to skip</span>
 </div>
 <main id="setup" hidden>
   <div class="vault">
@@ -95,31 +239,79 @@
   }
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function () {});
   var link = saved();
-  var demo = /[?&]demo\b/.test(location.search);   // ?demo: plays the opening with a pretend 2.5 s load, no app
+  // ?demo plays the opening with a pretend load and no app: ?demo (2.5 s), ?demo=700 (fast), ?demo=5000 (vault room)
+  var demoM = location.search.match(/[?&]demo(?:=(\d{1,5}))?\b/), demo = !!demoM;
   if ((link || demo) && !/[?&]change\b/.test(location.search)) {
-    var sp = document.getElementById('splash'), shown = Date.now(), door = sp.querySelector('.door'), wheel = null;
-    sp.hidden = false;   // the wheel turns back and forth like a combination lock while the app loads
-    // Put the door drawing into the page itself, so the wheel and bolts can be moved from here.
-    fetch('logo.svg').then(function (r) { return r.text(); }).then(function (t) {
-      door.innerHTML = t; wheel = door.querySelector('.wheel');
-    }).catch(function () {});
-    var opened = false, open = function () {
-      if (opened) return; opened = true;
-      var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
-      sp.classList.add('unlock');   // the wheel stops where it is, the bolts pull in, then the app fades in
-      if (wheel) wheel.style.animationPlayState = 'paused';
-      sp.classList.add('open');
-      setTimeout(function () { sp.remove(); }, still ? 450 : 650);
+    var sp = document.getElementById('splash'), st = document.getElementById('status'), coinG = document.getElementById('coins'), door = sp.querySelector('.door');
+    var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var MIN = 1500, CAP = 7000, ROOM_MIN = 1400, GAP = 1600;   // wheel turns at least 1.5 s; never past 7 s; at least 1.4 s in the room
+    var LINES = ['Counting the coins…', 'Balancing the ledgers…', 'Debits to the left, credits to the right…', 'Casting the trial balance…', 'Stamping the vouchers…',
+      'Carrying the balances forward…', 'Polishing the scales…', 'Checking the vault locks…', 'Sharpening the quills…', 'Ticking and bashing the columns…'];
+    var shown = Date.now(), timers = [], isReady = false, inRoom = false, roomAt = 0, done = false, k = -1, coinT = 0;
+    var later = function (f, ms) { timers.push(setTimeout(f, ms)); };
+    var add = function (c) { sp.classList.add(c); };
+    window.gringottsOpening = [];   // what happened, in order (read by the tests)
+    var mark = function (s) { gringottsOpening.push(s); };
+    sp.hidden = false;
+    // The door drawing goes into the page itself, so the wheel and bolts can be moved from here.
+    fetch('logo.svg').then(function (r) { return r.text(); }).then(function (t) { if (!done) door.innerHTML = t; }).catch(function () {});
+    var finish = function (why) {
+      if (done) return; done = true; mark('open:' + why);
+      timers.forEach(clearTimeout); clearTimeout(coinT); clearTimeout(rot);
+      add('open'); setTimeout(function () { sp.remove(); }, still ? 0 : 400);
     };
-    var ready = function () { setTimeout(open, Math.max(0, 1500 - (Date.now() - shown))); };   // at least a right and a left turn first (1.5 s)
-    setTimeout(open, 2400);   // never longer than about 3 s with the fade, even while the app is still loading
-    sp.addEventListener('click', open);   // tap to skip
-    if (demo) setTimeout(ready, 2500);
+    var rot = 0, next = function (gap) { k = (k + 1) % LINES.length; st.textContent = LINES[k]; st.classList.add('on'); clearTimeout(rot); rot = setTimeout(function () { if (!done) next(gap); }, gap); };
+    later(function () { next(1100); }, 600);   // status lines from 0.6 s on both paths, as in the mockup
+    var coins = function () {   // bursts of 5–6 onto one stack, then 5–6 onto the other
+      if (still || !coinG.animate) return;
+      var side = Math.random() < .5 ? 0 : 1, left = 5 + Math.round(Math.random());
+      (function drop() {
+        if (done || sp.classList.contains('stamp')) return;
+        var e = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+        e.setAttribute('cx', (side ? 168 : 33) + (Math.random() * 6 - 3)); e.setAttribute('cy', side ? 122 : 113); e.setAttribute('rx', 9); e.setAttribute('ry', 2.6);
+        coinG.appendChild(e);
+        e.animate([{ transform: 'translateY(-125px)', opacity: 1 }, { transform: 'translateY(0)', opacity: 1, offset: .85 }, { transform: 'translateY(0)', opacity: 0 }],
+          { duration: 900, easing: 'cubic-bezier(.5,0,.9,.6)' }).onfinish = function () { e.remove(); };
+        if (--left <= 0) { side = 1 - side; left = 5 + Math.round(Math.random()); coinT = setTimeout(drop, 450 + Math.random() * 250); }
+        else coinT = setTimeout(drop, 170 + Math.random() * 130);
+      })();
+    };
+    // Fast: bolts in, the door swings back on its hinges with gold light, the goblin rises, pushes up his spectacles, blinks, bows.
+    var fast = function () {
+      if (done) return; mark('fast');
+      add('unlock'); later(function () { add('swing'); }, still ? 0 : 300);
+      later(function () { add('pop'); }, still ? 0 : 420);
+      later(function () { finish('ready'); }, still ? 300 : 2050);
+    };
+    // Slow: deeper into the vault room; the goblin writes, coins drop, generic status lines (nothing personal).
+    var room = function () {
+      if (done || isReady) return; inRoom = true; mark('room');
+      add('unlock'); later(function () { add('swing'); add('deep'); }, still ? 0 : 300);
+      roomAt = Date.now() + (still ? 0 : 750);
+      later(function () { add('room'); k = -1; next(GAP); coins(); }, still ? 0 : 750);
+    };
+    var ready = function (why) {
+      if (isReady || done) return; isReady = true; mark('ready:' + why);
+      if (!inRoom) { later(fast, Math.max(0, MIN - (Date.now() - shown))); return; }
+      later(function () {   // he stamps ENTERED, the room fades into Home
+        if (done) return; add('stamp'); clearTimeout(rot); st.textContent = 'Entered. Opening the vault…';
+        later(function () { finish(why); }, still ? 200 : 800);
+      }, Math.max(0, roomAt + ROOM_MIN - Date.now()));
+    };
+    later(room, MIN);                                       // not ready at 1.5 s: into the vault room
+    later(function () { if (!done) { isReady = false; inRoom = true; if (!roomAt) roomAt = Date.now() - ROOM_MIN; ready('7 s limit'); } }, CAP);
+    sp.addEventListener('click', function () { finish('tapped'); });   // tap to skip, at any point
+    sp.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); finish('tapped'); } });
+    if (demo) later(function () { ready('demo'); }, demoM[1] ? Number(demoM[1]) : 2500);
     else {
+      // The app says it is ready once Home has drawn its figures. Only a message of that type from Google's app pages counts.
+      addEventListener('message', function (e) {
+        if (/^https:\/\/([a-z0-9-]+\.)*googleusercontent\.com$/.test(e.origin) && e.data && e.data.type === 'gringotts-ready') ready('message');
+      });
       var fr = document.createElement('iframe');
       fr.src = withScreen(link, asked()); fr.title = 'Gringotts';
       fr.allow = 'clipboard-read; clipboard-write';
-      fr.addEventListener('load', ready);
+      fr.addEventListener('load', function () { later(function () { ready('frame loaded'); }, 2500); });   // fallback: an app without the message
       document.body.insertBefore(fr, sp);
     }
   } else {

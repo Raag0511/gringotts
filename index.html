@@ -29,6 +29,10 @@
   .rule::before, .rule::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(226,181,76,0), var(--gold)); }
   .rule::after { transform: scaleX(-1); }
   .rule i { width: 6px; height: 6px; background: var(--gold); transform: rotate(45deg); }
+  /* the Patronus the app last told this phone about (Gringotts style only): a soft glow under the name */
+  .pat { display: block; width: 120px; height: 67px; margin: 18px auto 0; fill: #E9F2F7; opacity: .55; filter: drop-shadow(0 0 10px #cfe6f3); animation: patGlow 2.6s ease-in-out infinite; }
+  .pat[hidden] { display: none; }
+  @keyframes patGlow { 50% { opacity: .3; } }
   .tag { margin: 12px 0 0; font: 400 .78rem Cinzel, Georgia, serif; letter-spacing: .28em; padding-left: .28em; color: var(--muted); }
 
   /* ---- the opening ---- */
@@ -90,7 +94,7 @@
   .skip { position: absolute; right: 16px; bottom: max(16px, env(safe-area-inset-bottom)); font: 500 .7rem ui-monospace, Consolas, monospace; letter-spacing: .08em; color: rgba(169,160,138,.55); }
   #splash.open { transition: opacity .35s ease-in; opacity: 0; pointer-events: none; }
   @media (prefers-reduced-motion: reduce) {
-    .wheel, .vroom *, .popgob, .popgob * { animation: none !important; }
+    .wheel, .vroom *, .popgob, .popgob *, .pat { animation: none !important; }
     #splash .door, #splash .glow, .popgob, .front, .vroom, #splash.open { transition: none !important; }
   }
 
@@ -153,6 +157,7 @@
       <p class="word">Gringotts</p>
       <div class="rule"><i></i></div>
       <p class="tag">Goblins at Work</p>
+      <svg class="pat" id="pat" viewBox="0 0 90 50" aria-hidden="true" hidden></svg>
     </div>
   </div>
 
@@ -237,6 +242,33 @@
   function withScreen(link, q) {
     try { var u = new URL(link); q.forEach(function (v, k) { u.searchParams.set(k, v); }); return u.href; } catch (e) { return link; }
   }
+  // The Patronus: only a creature's name comes from the app (checked against this list); kept in this browser.
+  var PAT = {
+    fox: 'M22 26 Q14 21 6 24 Q1 27 2 31 Q8 33 14 32 Q19 31 22 30 Q22 33 23 35 L22 41 L21 47 L24 48 L25 47 L25 41 L27 37 L29 38 L29 43 L29 47 L32 48 L33 47 L32 42 L32 37 Q42 38 52 37 L52 42 L52 47 L55 48 L56 47 L55 42 L56 38 L58 39 L58 47 L61 48 L62 47 L61 41 Q61 35 61 32 Q63 29 66 27 Q71 26 78 25 Q76 22 71 20 Q69 17 68 14 L67 10 L64 14 L62 10 L61 15 Q57 18 54 24 Q42 23 32 24 Q26 24 22 26 Z',
+    hare: 'M24 33 Q20 29 22 26 Q25 25 27 28 Q32 22 42 22 Q52 22 58 27 Q60 24 63 22 Q63 15 64 6 Q66 3 67 6 Q67 13 66 21 Q68 13 71 5 Q73 3 74 6 Q72 13 68 22 Q74 24 78 27 Q78 30 75 31 Q70 31 66 32 Q63 36 62 41 L64 46 L67 48 L60 48 L58 43 L57 38 Q50 41 44 41 Q48 44 50 46 L52 48 L40 48 Q36 46 34 44 L30 41 Q26 37 24 33 Z',
+    owl: 'M45 6 Q41 6 40 10 L38 6 Q37 10 38 14 Q30 12 22 9 Q12 6 2 8 Q6 11 10 12 Q5 13 3 16 Q8 16 12 16 Q8 19 7 22 Q13 20 18 20 Q15 23 15 26 Q22 23 30 22 Q34 23 36 26 Q35 34 37 38 Q39 43 42 44 L43 47 L45 45 L47 47 L48 44 Q51 43 53 38 Q55 34 54 26 Q56 23 60 22 Q68 23 75 26 Q75 23 72 20 Q77 20 83 22 Q82 19 78 16 Q82 16 87 16 Q85 13 80 12 Q84 11 88 8 Q78 6 68 9 Q60 12 52 14 Q53 10 52 6 L50 10 Q49 6 45 6 Z',
+    horse: 'M20 19 Q12 22 11 32 Q10 38 13 43 Q14 36 16 31 Q17 27 20 25 Q19 29 20 32 L19 40 L18 46 L21 48 L23 48 L23 45 L24 39 Q25 36 27 34 L28 40 L28 46 L31 48 L33 48 L32 45 L32 38 Q32 35 33 34 Q42 35 52 34 L52 40 L53 46 L55 48 L57 48 L56 45 L56 39 L57 35 L59 37 L60 46 L62 48 L64 48 L63 45 L63 38 Q63 32 62 29 Q64 26 67 22 Q72 21 76 22 Q80 22 80 19 Q78 15 72 9 L71 4 L69 7 L67 3 L66 8 Q60 12 56 19 Q44 17 32 18 Q24 18 20 19 Z',
+    cat: 'M22 27 Q16 25 14 18 Q12 12 15 7 Q17 5 18 8 Q16 13 18 18 Q20 22 24 23 Q34 22 44 23 Q52 23 57 22 Q60 18 62 15 L62 9 L66 13 Q69 12 72 13 L75 9 L75 16 Q77 19 76 22 Q74 25 70 26 Q66 27 64 29 Q63 34 62 37 L62 46 L64 48 L60 48 L59 46 L58 38 L56 39 L56 46 L58 48 L54 48 L53 46 L52 39 Q42 40 32 39 L31 46 L33 48 L29 48 L28 46 L27 39 L26 40 L25 46 L27 48 L23 48 L22 46 Q21 38 21 34 Q21 30 22 27 Z',
+    stag: 'M21 23 Q17 20 15 23 Q17 26 21 26 Q20 30 21 33 L20 41 L19 47 L22 48 L23 47 L23 41 L25 35 L27 36 L28 42 L28 47 L31 48 L32 47 L31 41 L31 35 Q42 36 52 35 L52 41 L53 47 L55 48 L56 47 L56 41 L56 36 L58 37 L59 47 L61 48 L62 47 L62 40 Q62 33 61 30 Q63 25 66 20 Q70 20 74 21 Q78 21 78 19 Q76 16 72 13 Q73 8 76 5 L75 1 L77 1 L78 4 L80 2 L81.5 3 L78.5 7 Q76 10 75 13 L72 14 L70 12 Q67 8 62 6 L58 3 L60 2 L63 4 L62 0 L64 0 L65.5 4.5 L67 5.5 L67 1 L69 1 L69.5 7 Q71 10 71 13 L69 14 L64 11 L67 14 Q68 13 66 13 Q61 16 56 21 Q44 20 32 21 Q25 21 21 23 Z',
+    doe: 'M21 24 Q18 20 16 22 Q17 26 21 27 Q20 30 21 33 L20 41 L19 47 L22 48 L23 47 L23 41 L25 35 L27 36 L28 42 L28 47 L31 48 L32 47 L31 41 L31 35 Q42 36 52 35 L52 41 L53 47 L55 48 L56 47 L56 41 L56 36 L58 37 L59 47 L61 48 L62 47 L62 40 Q62 33 61 30 Q63 24 66 19 Q70 19 74 20 Q78 20 78 18 Q76 15 71 12 Q69 6 64 4 Q66 9 67 12 L65 12 Q63 7 60 6 Q61 10 64 14 Q60 17 56 21 Q44 21 32 22 Q25 22 21 24 Z',
+    otter: 'M30 36 Q22 37 14 38 Q6 39 1 38 Q6 36 14 34 Q22 31 30 30 Q38 26 50 26 Q60 26 66 28 Q70 26 75 26 Q81 27 83 30 L86 31 Q85 33 82 34 Q77 36 72 35 Q69 37 67 38 L68 44 L70 47 L64 47 L62 41 Q56 42 50 42 L50 44 L52 47 L46 47 L45 42 Q40 41 36 40 L36 44 L38 47 L32 47 Q30 42 30 36 Z',
+    wolf: 'M22 25 Q16 28 12 34 Q9 38 10 42 Q14 40 17 36 Q20 33 22 31 Q22 34 23 36 L22 41 L21 47 L24 48 L25 47 L25 41 L27 37 L29 38 L29 43 L29 47 L32 48 L33 47 L32 42 L32 37 Q42 38 52 37 L52 42 L52 47 L55 48 L56 47 L55 42 L56 38 L58 39 L58 47 L61 48 L62 47 L61 41 Q61 34 61 31 Q63 28 67 27 Q72 27 80 26 L80 24 Q76 22 72 20 Q70 16 69 13 L67 8 L65 13 L63 8 L62 14 Q57 17 54 22 Q42 21 32 22 Q26 22 22 25 Z',
+    dog: 'M22 26 Q17 23 15 17 Q14 13 16 12 Q18 17 21 20 Q23 22 25 23 Q34 22 44 23 Q50 23 55 22 Q57 18 60 15 Q64 12 70 12 Q74 13 76 16 Q80 17 82 19 L81 22 Q77 23 73 23 Q71 26 67 27 Q63 30 62 33 L62 47 L64 48 L59 48 L58 46 L57 38 L55 38 L55 46 L57 48 L52 48 L51 46 L51 38 Q42 39 33 38 L32 46 L34 48 L29 48 L28 46 L28 38 L26 38 L25 46 L27 48 L22 48 L21 46 Q20 38 21 33 Q21 29 22 26 Z M64 14 Q62 19 63 24 Q66 22 67 17 Q66 14 64 14 Z',
+    swan: 'M8 34 Q6 30 9 28 Q12 30 16 30 Q14 26 16 22 Q22 26 30 26 Q38 22 46 24 Q52 26 54 30 Q56 22 55 16 Q54 9 58 6 Q62 4 65 7 L72 10 L65 11 Q61 10 60 14 Q60 22 61 30 Q62 36 58 40 Q52 44 40 44 Q24 44 14 40 Q9 38 8 34 Z',
+    eagle: 'M44 18 Q38 12 30 10 Q20 7 4 3 Q9 7 14 9 Q8 9 3 10 Q9 13 15 14 Q9 15 5 17 Q12 18 19 18 Q14 20 11 23 Q20 22 28 22 Q33 24 36 27 Q37 31 39 34 L34 40 L40 39 L42 43 L45 40 L48 43 L50 39 L56 40 L51 34 Q53 31 54 27 Q57 24 62 22 Q70 22 79 23 Q76 20 71 18 Q78 18 85 17 Q81 15 75 14 Q81 13 87 10 Q82 9 76 9 Q81 7 86 3 Q70 7 60 10 Q52 12 48 16 Q49 12 47 10 Q44 10 43 13 Q43 16 44 18 Z',
+    dolphin: 'M4 22 Q6 26 10 28 Q4 30 2 34 Q8 33 13 31 Q24 37 40 38 L43 43 L47 38 Q60 37 70 32 Q76 30 82 31 L88 29 Q82 27 77 27 Q70 22 58 20 L52 13 L50 20 Q34 21 20 26 Q14 24 10 20 Q6 20 4 22 Z',
+    phoenix: 'M52 22 Q48 14 40 9 Q30 4 16 3 Q24 7 30 11 Q20 8 10 9 Q18 12 26 15 Q16 15 8 18 Q20 20 32 22 Q36 25 38 28 Q30 32 20 36 Q10 40 2 48 Q14 44 22 42 Q16 46 14 50 Q26 44 36 38 Q36 44 32 50 Q42 44 44 36 Q48 34 52 30 Q58 28 64 24 Q68 20 70 16 L76 15 L70 13 Q70 8 66 6 Q68 4 66 1 Q63 4 62 7 Q60 4 57 4 Q60 7 60 10 Q56 14 52 22 Z'
+  };
+  var PKEY = 'gringottsPatronus';
+  function patShow() {
+    var k = ''; try { k = localStorage.getItem(PKEY) || ''; } catch (e) {}
+    var names = Object.keys(PAT), el = document.getElementById('pat');
+    if (k === 'surprise') k = names[Math.floor(Math.random() * names.length)];
+    if (!PAT[k]) { el.hidden = true; return; }
+    el.innerHTML = '<path d="' + PAT[k] + '"/>'; el.hidden = false;
+  }
+  function patSave(k) { if (k !== '' && k !== 'surprise' && !PAT[k]) return; try { if (k) localStorage.setItem(PKEY, k); else localStorage.removeItem(PKEY); } catch (e) {} }
+  patShow();
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function () {});
   var link = saved();
   // ?demo plays the opening with a pretend load and no app: ?demo (2.5 s), ?demo=700 (fast), ?demo=5000 (vault room)
@@ -307,6 +339,7 @@
       // The app says it is ready once Home has drawn its figures. Only a message of that type from Google's app pages counts.
       addEventListener('message', function (e) {
         if (/^https:\/\/([a-z0-9-]+\.)*googleusercontent\.com$/.test(e.origin) && e.data && e.data.type === 'gringotts-ready') ready('message');
+        if (/^https:\/\/([a-z0-9-]+\.)*googleusercontent\.com$/.test(e.origin) && e.data && e.data.type === 'gringotts-patronus' && typeof e.data.k === 'string') patSave(e.data.k);
       });
       var fr = document.createElement('iframe');
       fr.src = withScreen(link, asked()); fr.title = 'Gringotts';

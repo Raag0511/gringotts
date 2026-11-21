@@ -38,46 +38,40 @@
   /* ---- the opening ---- */
   #splash { position: fixed; inset: 0; background: radial-gradient(90% 55% at 50% 42%, #173a31 0%, var(--bg) 62%); cursor: pointer; outline: none; z-index: 5; }
   #splash[hidden] { display: none; }
-  .front { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; transition: opacity .5s; }
-  #splash .door-wrap { width: min(56vw, 240px); height: min(56vw, 240px); }   /* the mockup's size */
-  #splash .door-wrap::before { animation: breathe 2.6s ease-in-out infinite; }
-  @keyframes breathe { 50% { opacity: .55; transform: scale(.94); } }
-  #splash .door svg, #splash .door img { display: block; width: 100%; height: 100%; }
+  /* 7.37 (option D, chosen 21 Nov): the door sits in the room's arch; its wheel turns, the bolts pull in, it rolls off */
+  .archw { position: relative; width: min(92vw, 380px); }
+  .archw .rdoor { position: absolute; left: 50%; top: 52%; width: 62%; aspect-ratio: 1; transform: translate(-50%, -50%); z-index: 2;
+    transition: transform 1s cubic-bezier(.6,0,.3,1); }
+  #splash .rdoor svg, #splash .rdoor img { display: block; width: 100%; height: 100%; }
   .wheel, .bolts { transform-origin: 50px 50px; }
-  .glow { position: absolute; inset: 6%; border-radius: 50%; opacity: 0; transform: scale(.6);
-    background: radial-gradient(circle, #fff6d6 0%, var(--gold-hi) 30%, rgba(226,181,76,0) 70%); }
-  /* the goblin in the doorway: spectacles pushed up, a blink, a small formal bow */
-  .popgob { position: absolute; left: 12%; top: 8%; width: 76%; z-index: 1; opacity: 0; transform: translateY(34%) scale(.6);
-    transition: transform .5s cubic-bezier(.3,1.5,.5,1), opacity .2s; }
-  .popgob .headg, .popgob .arm, .popgob .lids, .popgob .bodyg { transform-box: fill-box; }
-  .popgob .headg { transform-origin: 50% 100%; }
-  .popgob .lids { transform-origin: 50% 0; transform: scaleY(0); }
-  .popgob .arm { transform: translate(0, 32px); }
   #splash.unlock .wheel { animation-play-state: paused; }
-  #splash.unlock .bolts { transition: transform .4s cubic-bezier(.3,0,.2,1); transform: scale(.9); }   /* bolts pull in */
-  #splash.swing .door { transition: transform .55s cubic-bezier(.55,0,.25,1); transform: rotateY(-104deg); }   /* the door swings back */
-  #splash.swing .glow { transition: opacity .25s, transform .6s ease-out; opacity: 1; transform: scale(1.9); }
-  #splash.deep .glow { transition: opacity .25s, transform .9s ease-in; transform: scale(6); }
-  #splash.pop .popgob { opacity: 1; transform: none; }
-  #splash.pop .popgob .arm { animation: specs 1s ease-in-out .3s both; }
-  #splash.pop .popgob .glint { animation: glint .45s ease .72s 1; }
-  #splash.pop .popgob .lids { animation: lid .22s ease 1.05s 1; }
-  #splash.pop .popgob .headg { animation: bow .7s ease-in-out 1.25s both; }
-  #splash.pop .popgob .bodyg { animation: bowb .7s ease-in-out 1.25s both; }
-  @keyframes specs { 0% { transform: translate(0,32px); } 38%, 56% { transform: translate(-7.5px,-7.5px); } 100% { transform: translate(0,32px); } }
-  @keyframes glint { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
+  #splash.unlock .bolts { transition: transform .35s cubic-bezier(.3,0,.2,1); transform: scale(.9); }
+  #splash.roll .rdoor { transform: translate(200%, -50%) rotate(300deg); }
+  .vroom .vscene { opacity: 0; transition: opacity .5s ease .2s; }
+  #splash.roll .vscene { opacity: 1; }
+  #splash.roll .shine { animation: shine .9s ease-out .25s; }
+  @keyframes shine { 0% { opacity: .85; transform: scale(.4); } 100% { opacity: 0; transform: scale(1.6); } }
+  .vroom .shine { transform-box: fill-box; transform-origin: center; }
+  .vroom .lids { transform-box: fill-box; transform-origin: 50% 0; transform: scaleY(0); }
+  .vroom .earL, .vroom .earR { transform-box: fill-box; }
+  .vroom .earL { transform-origin: 100% 80%; } .vroom .earR { transform-origin: 0 80%; }
+  #splash.room .lids { animation: lid .22s ease 1.1s 1; }
+  #splash.room .earL { animation: earL .5s ease 1.6s 1; } #splash.room .earR { animation: earR .5s ease 1.6s 1; }
   @keyframes lid { 50% { transform: scaleY(1); } }
-  @keyframes bow { 45% { transform: translateY(5px) scaleY(.93) rotate(-2deg); } }
-  @keyframes bowb { 45% { transform: translateY(2px); } }
+  @keyframes earL { 40% { transform: rotate(-9deg); } 70% { transform: rotate(3deg); } }
+  @keyframes earR { 40% { transform: rotate(9deg); } 70% { transform: rotate(-3deg); } }
+  @keyframes glint { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
 
   /* the vault room: first or slow load */
-  .vroom { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; opacity: 0; transition: opacity .6s; pointer-events: none; }
+  .vroom { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; pointer-events: none; }
   .vroom .mini { font: 800 clamp(1.1rem, 5vw, 1.4rem)/1 Cinzel, Georgia, serif; letter-spacing: .22em; padding-left: .22em; color: var(--gold); }
   .vroom .rule { margin: 8px 0 0; width: min(170px, 46vw); }
   .vroom .mtag { font: 400 .68rem Cinzel, Georgia, serif; letter-spacing: .28em; padding-left: .28em; color: var(--muted); margin: 8px 0 6px; }
-  .vroom svg { width: min(92vw, 380px); overflow: visible; }
+  .vroom svg { display: block; width: 100%; overflow: visible; }
+  .vroom .archw > svg { width: 100%; }
   .vroom .quill { transform-box: fill-box; transform-origin: 10% 90%; animation: scribble .3s ease-in-out infinite alternate; }
-  .vroom .head { transform-box: fill-box; transform-origin: 50% 90%; animation: nod 3.2s ease-in-out infinite; }
+  .vroom .head { transform-box: fill-box; transform-origin: 50% 90%; }
+  #splash.room .head { animation: nod 3.2s ease-in-out 2.4s infinite; }
   .vroom .rglint { animation: glint 3s ease 1s infinite; }
   .vroom .ink { stroke-dasharray: 40; stroke-dashoffset: 40; animation: ink 2.4s linear infinite; }
   .vroom .ink:nth-of-type(2) { animation-delay: .8s; } .vroom .ink:nth-of-type(3) { animation-delay: 1.6s; }
@@ -85,17 +79,15 @@
   @keyframes scribble { from { transform: rotate(-7deg); } to { transform: rotate(6deg) translateX(2px); } }
   @keyframes nod { 0%, 60%, 100% { transform: none; } 70% { transform: rotate(-5deg); } 85% { transform: rotate(3deg); } }
   @keyframes ink { 0% { stroke-dashoffset: 40; } 40%, 100% { stroke-dashoffset: 0; } }
-  #splash.room .front { opacity: 0; }
-  #splash.room .vroom { opacity: 1; }
   #splash.stamp .stampg { opacity: 1; transform: scale(1) rotate(-10deg); }
   #splash.stamp .quill, #splash.stamp .ink { animation-play-state: paused; }
   .status { position: absolute; left: 0; right: 0; bottom: max(8.5%, 40px); text-align: center; font: 500 .72rem ui-monospace, Consolas, monospace; color: var(--muted); opacity: 0; transition: opacity .3s; padding: 0 20px; }
   .status.on { opacity: 1; }
-  .skip { position: absolute; right: 16px; bottom: max(16px, env(safe-area-inset-bottom)); font: 500 .7rem ui-monospace, Consolas, monospace; letter-spacing: .08em; color: rgba(169,160,138,.55); }
+  .skip { position: absolute; right: 16px; bottom: max(16px, env(safe-area-inset-bottom)); font: 500 .72rem ui-monospace, Consolas, monospace; letter-spacing: .08em; color: var(--muted); }
   #splash.open { transition: opacity .35s ease-in; opacity: 0; pointer-events: none; }
   @media (prefers-reduced-motion: reduce) {
-    .wheel, .vroom *, .popgob, .popgob *, .pat { animation: none !important; }
-    #splash .door, #splash .glow, .popgob, .front, .vroom, #splash.open { transition: none !important; }
+    .wheel, .vroom *, .pat { animation: none !important; }
+    #splash .rdoor, .vroom .vscene, #splash.open { transition: none !important; }
   }
 
   main { max-width: 26rem; margin: 0 auto; padding: max(48px, 8vh) 16px 32px; }
@@ -113,62 +105,19 @@
 <body>
 <!-- This page is public: it holds no link, secret or data. Each phone keeps its own app link in this browser's storage. -->
 <div id="splash" role="button" tabindex="0" aria-label="Opening Gringotts. Tap to skip" hidden>
-  <div class="front">
-    <div class="vault">
-      <div class="door-wrap">
-        <div class="glow"></div>
-        <!-- the goblin who opens the door (original drawing) -->
-        <svg class="popgob" viewBox="0 0 100 100" aria-hidden="true">
-          <defs><linearGradient id="gskin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#729470"/><stop offset="1" stop-color="#4f6f4c"/></linearGradient></defs>
-          <g class="bodyg">
-            <path d="M14 100 Q18 80 50 76 Q82 80 86 100 Z" fill="#1c2620"/>
-            <path d="M40 78 L50 100 L60 78 Z" fill="#6b4f22"/>
-            <path d="M40 78 L35 94 L46 86 Z M60 78 L65 94 L54 86 Z" fill="#141c17"/>
-            <path d="M42 77 L50 85 L58 77 L54 74 L50 78 L46 74 Z" fill="#EADBB8"/>
-            <circle cx="50" cy="90" r="1.3" fill="#E2B54C"/><circle cx="50" cy="96" r="1.3" fill="#E2B54C"/>
-            <path d="M51 91 Q56 96 59 92" stroke="#E2B54C" stroke-width=".9" fill="none"/><circle cx="59.5" cy="92" r="1.6" fill="#E2B54C"/>
-          </g>
-          <g class="headg">
-            <path d="M31 52 Q15 38 3 27 Q19 30 35 59 Z" fill="#5d7f59"/><path d="M29 51 Q17 40 10 32 Q21 36 32 56 Z" fill="#c98f7a" opacity=".4"/>
-            <path d="M69 52 Q85 38 97 27 Q81 30 65 59 Z" fill="#5d7f59"/><path d="M71 51 Q83 40 90 32 Q79 36 68 56 Z" fill="#c98f7a" opacity=".4"/>
-            <path d="M50 30 C65 30 74 42 73 56 C72 68 63 77 50 77 C37 77 28 68 27 56 C26 42 35 30 50 30 Z" fill="url(#gskin)"/>
-            <path d="M40 37.5 Q50 34.5 60 37.5 M42.5 41 Q50 39 57.5 41" stroke="#3e5a3b" stroke-width=".8" fill="none"/>
-            <path d="M36 46 L46 48.5 M64 46 L54 48.5" stroke="#22301f" stroke-width="2.3" stroke-linecap="round"/>
-            <ellipse cx="43" cy="53" rx="3.3" ry="2.5" fill="#f3ead0"/><ellipse cx="57" cy="53" rx="3.3" ry="2.5" fill="#f3ead0"/>
-            <circle cx="43.6" cy="53.3" r="1.6" fill="#1a1208"/><circle cx="57.6" cy="53.3" r="1.6" fill="#1a1208"/>
-            <g class="lids"><ellipse cx="43" cy="53" rx="3.8" ry="3" fill="#5d7f59"/><ellipse cx="57" cy="53" rx="3.8" ry="3" fill="#5d7f59"/></g>
-            <circle cx="43" cy="53" r="6" fill="#fbe3a0" fill-opacity=".14" stroke="#E2B54C" stroke-width="1.5"/>
-            <circle cx="57" cy="53" r="6" fill="#fbe3a0" fill-opacity=".14" stroke="#E2B54C" stroke-width="1.5"/>
-            <path d="M49 53 h2 M37 52 L31 50 M63 52 L69 50" stroke="#E2B54C" stroke-width="1.1"/>
-            <path class="glint" d="M53 48.5 l3.5 3.5 M60 48 l-1.5 1.5" stroke="#fff6d8" stroke-width="1.5" stroke-linecap="round" opacity="0"/>
-            <path d="M50 54 C55 58 57.5 64 52.5 67 C50.5 68 48 66.5 49 63 Z" fill="#4c6b4a"/>
-            <path d="M38 62 q2 4 5 6 M62 62 q-2 4 -5 6" stroke="#3e5a3b" stroke-width=".8" fill="none"/>
-            <path d="M43 70.5 Q50 73.5 58 69.5" stroke="#22301f" stroke-width="1.4" fill="none" stroke-linecap="round"/>
-          </g>
-          <g class="arm">
-            <path d="M73 104 Q74 88 67 77" stroke="#2c3a32" stroke-width="6.5" fill="none" stroke-linecap="round"/><path d="M68.5 78.5 L64.5 75.5" stroke="#EADBB8" stroke-width="3" stroke-linecap="round"/>
-            <ellipse cx="65" cy="72" rx="4.2" ry="3.5" fill="#5d7f59"/>
-            <path d="M63.5 70 L58.5 61.5" stroke="#5d7f59" stroke-width="2.2" stroke-linecap="round"/>
-            <path d="M66.5 69.5 L64 64" stroke="#4f6f4c" stroke-width="2" stroke-linecap="round"/>
-          </g>
-        </svg>
-        <div class="door"><img src="logo.svg" alt=""></div>
-      </div>
-      <p class="word">Gringotts</p>
-      <div class="rule"><i></i></div>
-      <p class="tag">Goblins at Work</p>
-      <svg class="pat" id="pat" viewBox="0 0 90 50" aria-hidden="true" hidden></svg>
-    </div>
-  </div>
-
   <!-- the vault room: a goblin writing in his ledger while coins land on his stacks (original drawing) -->
   <div class="vroom" aria-hidden="true">
     <div class="mini">Gringotts</div>
     <div class="rule"><i></i></div>
     <div class="mtag">Goblins at Work</div>
+    <svg class="pat" id="pat" viewBox="0 0 90 50" aria-hidden="true" hidden></svg>
+    <div class="archw"><div class="door rdoor"><img src="logo.svg" alt=""></div>
     <svg viewBox="0 0 300 300">
       <defs><radialGradient id="rg" cx="50%" cy="55%" r="55%"><stop offset="0" stop-color="#f1d68a" stop-opacity=".45"/><stop offset="1" stop-color="#f1d68a" stop-opacity="0"/></radialGradient></defs>
       <path d="M28 300 V110 Q28 22 150 22 Q272 22 272 110 V300 Z" fill="#12302A" stroke="#9C7424" stroke-width="2"/>
+      <clipPath id="archclip"><path d="M28 300 V110 Q28 22 150 22 Q272 22 272 110 V300 Z"/></clipPath>
+      <g class="vscene" clip-path="url(#archclip)">
+      <ellipse class="shine" cx="150" cy="160" rx="110" ry="100" fill="#fff3cf" opacity="0"/>
       <ellipse cx="150" cy="170" rx="125" ry="115" fill="url(#rg)"/>
       <g stroke="#3a2a12" stroke-width="5"><path d="M48 92 H252"/><path d="M48 138 H252"/></g>
       <g fill="#E2B54C" stroke="#7a5a1c" stroke-width=".8">
@@ -181,20 +130,28 @@
       <g fill="#5a3f1a"><rect x="100" y="112" width="26" height="22" rx="2"/><rect x="176" y="116" width="22" height="18" rx="2"/></g>
       <g fill="#E2B54C"><rect x="111" y="120" width="4" height="5"/><rect x="185" y="122" width="4" height="5"/></g>
       <g transform="translate(50 128)">
-        <path d="M62 62 L14 38 L58 80 Z" fill="#4c6b4a"/><path d="M138 62 L186 38 L142 80 Z" fill="#4c6b4a"/>
-        <path d="M58 118 Q100 92 142 118 L148 140 L52 140 Z" fill="#1f2a24"/>
-        <circle cx="100" cy="112" r="1.8" fill="#E2B54C"/><circle cx="100" cy="120" r="1.8" fill="#E2B54C"/>
-        <g class="head">
-          <ellipse cx="100" cy="70" rx="40" ry="38" fill="#5d7f59"/>
-          <path d="M100 68 Q114 86 102 96 Q96 92 98 84 Z" fill="#4c6b4a"/>
-          <path d="M74 56 L92 60 M126 56 L108 60" stroke="#22301f" stroke-width="3" stroke-linecap="round"/>
-          <circle cx="85" cy="68" r="9" fill="#fbe3a0" fill-opacity=".18" stroke="#E2B54C" stroke-width="2"/>
-          <circle cx="115" cy="68" r="9" fill="#fbe3a0" fill-opacity=".18" stroke="#E2B54C" stroke-width="2"/>
-          <path d="M94 68 L106 68" stroke="#E2B54C" stroke-width="2"/>
-          <circle cx="86" cy="71" r="2.4" fill="#0E2620"/><circle cx="114" cy="71" r="2.4" fill="#0E2620"/>
-          <path class="rglint" d="M110 62 l4 4" stroke="#fff6d8" stroke-width="2" stroke-linecap="round" opacity="0"/>
-          <path d="M90 102 Q100 98 110 102" stroke="#22301f" stroke-width="2" fill="none" stroke-linecap="round"/>
-        </g>
+        <svg class="rgob" x="16" y="-19" width="167" height="167" viewBox="0 0 100 100">
+          <defs><linearGradient id="gsk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#86ab7f"/><stop offset="1" stop-color="#557852"/></linearGradient>
+            <linearGradient id="gea" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7d9f76"/><stop offset="1" stop-color="#55764f"/></linearGradient></defs>
+          <path d="M14 100 Q18 80 50 76 Q82 80 86 100 Z" fill="#1c2620" stroke="#2c3d32" stroke-width="1.2"/><path d="M40 78 L50 100 L60 78 Z" fill="#6b4f22"/>
+          <path d="M42 77 L50 85 L58 77 L54 74 L50 78 L46 74 Z" fill="#EADBB8"/><circle cx="50" cy="90" r="1.3" fill="#E2B54C"/>
+          <g class="head">
+            <g class="earL"><path d="M34 46 C23 40 13 32 2 21 C6 34 13 47 21 56 C25 61 30 64 35 64 Z" fill="url(#gea)" stroke="#3b5636" stroke-width="2" stroke-linejoin="round"/><path d="M31 49 C23 44 15 37 8 29 C12 39 18 48 25 55 C27 57 30 58 32 58 Z" fill="#a9786a" opacity=".55"/></g>
+            <g class="earR"><path d="M66 46 C77 40 87 32 98 21 C94 34 87 47 79 56 C75 61 70 64 65 64 Z" fill="url(#gea)" stroke="#3b5636" stroke-width="2" stroke-linejoin="round"/><path d="M69 49 C77 44 85 37 92 29 C88 39 82 48 75 55 C73 57 70 58 68 58 Z" fill="#a9786a" opacity=".55"/><circle cx="83" cy="57" r="2.6" fill="none" stroke="#E2B54C" stroke-width="1.4"/></g>
+            <path d="M50 28 C66 28 75 40 74 55 C73 68 63 78 50 78 C37 78 27 68 26 55 C25 40 34 28 50 28 Z" fill="url(#gsk)" stroke="#3b5636" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M33 43 C36 34 43 30 50 30" stroke="#a9c9a0" stroke-width="1.4" fill="none" opacity=".7" stroke-linecap="round"/>
+            <path d="M40 37.5 Q50 34.5 60 37.5 M42.5 41 Q50 39 57.5 41" stroke="#3e5a3b" stroke-width=".8" fill="none"/>
+            <path d="M36 46 L46 48.5 M64 46 L54 48.5" stroke="#22301f" stroke-width="2.4" stroke-linecap="round"/>
+            <ellipse cx="43" cy="53" rx="3.3" ry="2.6" fill="#f3ead0"/><ellipse cx="57" cy="53" rx="3.3" ry="2.6" fill="#f3ead0"/>
+            <circle cx="43.6" cy="54" r="1.7" fill="#1a1208"/><circle cx="57.6" cy="54" r="1.7" fill="#1a1208"/>
+            <g class="lids"><ellipse cx="43" cy="53" rx="3.9" ry="3.1" fill="#6f9468"/><ellipse cx="57" cy="53" rx="3.9" ry="3.1" fill="#6f9468"/></g>
+            <circle cx="43" cy="53" r="6" fill="#fbe3a0" fill-opacity=".14" stroke="#E2B54C" stroke-width="1.5"/><circle cx="57" cy="53" r="6" fill="#fbe3a0" fill-opacity=".14" stroke="#E2B54C" stroke-width="1.5"/>
+            <path d="M49 53 h2 M37 52 L31 50 M63 52 L69 50" stroke="#E2B54C" stroke-width="1.1"/>
+            <path class="rglint" d="M53 48.5 l3.5 3.5" stroke="#fff6d8" stroke-width="1.5" stroke-linecap="round" opacity="0"/>
+            <path d="M50 54 C55 58 57.5 64 52.5 67 C50.5 68 48 66.5 49 63 Z" fill="#4c6b4a"/>
+            <path d="M43 70.5 Q50 73.5 58 69.5" stroke="#22301f" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+          </g>
+        </svg>
         <rect x="14" y="136" width="172" height="34" rx="3" fill="#4a3519"/>
         <path d="M54 131 L100 125 L146 131 L146 141 L54 141 Z" fill="#EADBB8"/>
         <path d="M100 125 L100 141" stroke="#b9a983" stroke-width="1"/>
@@ -208,7 +165,8 @@
         <g class="quill"><path d="M140 132 L164 92 Q170 86 168 98 L144 134 Z" fill="#EADBB8"/><circle cx="141" cy="132" r="5.5" fill="#5d7f59"/></g>
         <g class="stampg"><rect x="66" y="122" width="60" height="18" rx="2" fill="rgba(192,57,43,.12)" stroke="#c0392b" stroke-width="2"/><text x="96" y="135" text-anchor="middle" font-family="Cinzel,serif" font-weight="800" font-size="10" fill="#c0392b" letter-spacing="1.5">ENTERED</text></g>
       </g>
-    </svg>
+      </g>
+    </svg></div>
   </div>
   <p class="status" id="status" aria-live="polite"></p>
   <span class="skip">tap to skip</span>
@@ -308,19 +266,19 @@
         else coinT = setTimeout(drop, 170 + Math.random() * 130);
       })();
     };
-    // Fast: bolts in, the door swings back on its hinges with gold light, the goblin rises, pushes up his spectacles, blinks, bows.
+    // Both: bolts in, the door rolls off its arch with a flash of light, into the room: he writes, coins land, he stamps ENTERED.
+    var enter = function () { add('unlock'); later(function () { add('roll'); }, still ? 0 : 300); later(function () { add('room'); coins(); }, still ? 0 : 900); };
+    // Fast (ready by 1.5 s): the same scene, a short spell in the room, then ENTERED.
     var fast = function () {
-      if (done) return; mark('fast');
-      add('unlock'); later(function () { add('swing'); }, still ? 0 : 300);
-      later(function () { add('pop'); }, still ? 0 : 420);
-      later(function () { finish('ready'); }, still ? 300 : 2050);
+      if (done) return; mark('fast'); inRoom = true; enter();
+      later(function () { add('stamp'); clearTimeout(rot); st.textContent = 'Entered. Opening the vault…'; }, still ? 0 : 2000);
+      later(function () { finish('ready'); }, still ? 300 : 2800);
     };
     // Slow: deeper into the vault room; the goblin writes, coins drop, generic status lines (nothing personal).
     var room = function () {
       if (done || isReady) return; inRoom = true; mark('room');
-      add('unlock'); later(function () { add('swing'); add('deep'); }, still ? 0 : 300);
-      roomAt = Date.now() + (still ? 0 : 750);
-      later(function () { add('room'); k = -1; next(GAP); coins(); }, still ? 0 : 750);
+      enter(); roomAt = Date.now() + (still ? 0 : 900);
+      later(function () { k = -1; next(GAP); }, still ? 0 : 900);
     };
     var ready = function (why) {
       if (isReady || done) return; isReady = true; mark('ready:' + why);

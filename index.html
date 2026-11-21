@@ -51,7 +51,7 @@
   .wheel, .bolts { transform-origin: 50px 50px; }
   #splash.unlock .wheel { animation-play-state: paused; }
   #splash.unlock .bolts { transition: transform .35s cubic-bezier(.3,0,.2,1); transform: scale(.9); }
-  #splash.roll .rdoor { transform: translate(200%, -50%) rotate(300deg); }
+  #splash.roll .rdoor { transform: translate(calc(50vw + 60%), -50%) rotate(300deg); }   /* 7.37.3: half the screen plus the door, so it leaves the screen on a laptop too (200% stopped in view) */
   .vroom .vscene { opacity: 0; transition: opacity .5s ease .2s; }
   #splash.roll .vscene { opacity: 1; }
   #splash.roll .shine { animation: shine .9s ease-out .25s; }

@@ -291,6 +291,19 @@
   function patSave(k) { if (k !== '' && k !== 'surprise' && !PAT[k]) return; try { if (k) localStorage.setItem(PKEY, k); else localStorage.removeItem(PKEY); } catch (e) {} }
   patShow();
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function () {});
+  // The QR code from Gringotts › Finish set up opens #link=<the person's app link>: saved on this phone, then removed from
+  // the address (a # part is never sent to any server). Only a Google Apps Script app link is taken; replacing a
+  // different saved link asks first.
+  (function () {
+    var m = location.hash.match(/^#link=(.+)$/);
+    if (!m) return;
+    history.replaceState(null, '', location.pathname + location.search);
+    var v = ''; try { v = decodeURIComponent(m[1]); } catch (e) { return; }
+    if (!/^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(v)) return;
+    var cur = saved();
+    if (cur && cur !== v && !confirm('Replace the app link saved on this phone?')) return;
+    try { localStorage.setItem(KEY, v); } catch (e) {}
+  })();
   var link = saved();
   // ?demo plays the opening with a pretend load and no app: ?demo (2.5 s), ?demo=700 (fast), ?demo=5000 (vault room)
   var demoM = location.search.match(/[?&]demo(?:=(\d{1,5}))?\b/), demo = !!demoM;

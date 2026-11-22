@@ -325,6 +325,19 @@
     try { localStorage.setItem(KEY, v); } catch (e) {}
   })();
   var link = saved();
+  // v7.40: a trusted iPhone/iPad (the app's Phones.gs): after signing in once, the app hands this phone a key
+  // (#trust=<key>&ph=<the vault's no-sign-in link>). Both are kept only here; the # part is never sent anywhere.
+  var TKEY = 'gringottsTrust';
+  var trust = (function () { try { var x = JSON.parse(localStorage.getItem(TKEY) || 'null'); return x && /^[0-9a-f]{64}$/.test(x.k) ? x : null; } catch (e) { return null; } })();
+  (function () {
+    var m = location.hash.match(/^#trust=([0-9a-f]{64})&ph=(.+)$/);
+    if (!m) return;
+    history.replaceState(null, '', location.pathname + location.search);
+    var ph = ''; try { ph = decodeURIComponent(m[2]); } catch (e) { return; }
+    if (!/^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec\?phone=1$/.test(ph)) return;
+    trust = { k: m[1], ph: ph };
+    try { localStorage.setItem(TKEY, JSON.stringify(trust)); } catch (e) {}
+  })();
   // v7.40: on a phone, Gringotts opens only once installed (from the Home screen). In a phone's browser tab with a link
   // saved, the install screen shows instead and can't be skipped. Links from the morning email (?tab, ?card, ?row) and
   // computers are never stopped. Android: Chrome's own install box; iPhone/iPad: Share › Add to Home Screen.
@@ -424,15 +437,18 @@
     if (demo) later(function () { ready('demo'); }, demoM[1] ? Number(demoM[1]) : 2500);
     // v7.40 (22 Nov iPad test): Safari never lets Google's sign-in into a frame, and a Home-screen app has its own sign-ins,
     // so on iPhone/iPad the app opens as the whole page after the wheel's turn (Google's sign-in shows when needed).
-    else if (apple) later(function () { mark('whole page'); location.replace(withScreen(link, asked())); }, MIN);
+    else if (apple && !trust) later(function () { mark('whole page'); location.replace(withScreen(link, asked())); }, MIN);   // a trusted phone opens full screen below
     else {
       // The app says it is ready once Home has drawn its figures. Only a message of that type from Google's app pages counts.
       addEventListener('message', function (e) {
         if (/^https:\/\/([a-z0-9-]+\.)*googleusercontent\.com$/.test(e.origin) && e.data && e.data.type === 'gringotts-ready') ready('message');
         if (/^https:\/\/([a-z0-9-]+\.)*googleusercontent\.com$/.test(e.origin) && e.data && e.data.type === 'gringotts-patronus' && typeof e.data.k === 'string') patSave(e.data.k);
+        // v7.40: a trusted phone: the key only to Google's page that asks; a removed key → back to signing in
+        if (trust && apple && /^https:\/\/([a-z0-9-]+\.)*googleusercontent\.com$/.test(e.origin) && e.data && e.data.type === 'gringotts-key?' && e.source) e.source.postMessage({ type: 'gringotts-key', key: trust.k }, e.origin);
+        if (trust && /^https:\/\/([a-z0-9-]+\.)*googleusercontent\.com$/.test(e.origin) && e.data && e.data.type === 'gringotts-untrusted') { try { localStorage.removeItem(TKEY); } catch (x) {} location.replace(location.pathname + location.search); }
       });
       var fr = document.createElement('iframe');
-      fr.src = withScreen(link, asked()); fr.title = 'Gringotts';
+      fr.src = withScreen(trust && apple ? trust.ph : link, asked()); fr.title = 'Gringotts';
       fr.allow = 'clipboard-read; clipboard-write';
       fr.addEventListener('load', function () { later(function () { ready('frame loaded'); }, 2500); });   // fallback: an app without the message
       document.body.insertBefore(fr, sp);

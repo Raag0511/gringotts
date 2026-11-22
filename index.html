@@ -28,6 +28,7 @@
   .rule { display: flex; align-items: center; gap: 10px; margin: 14px 0 0; width: min(220px, 60vw); }
   .rule::before, .rule::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(226,181,76,0), var(--gold)); }
   .rule::after { transform: scaleX(-1); }
+  .goblins { margin: 8px 0 0; font: 600 .78rem/1 Cinzel, Georgia, serif; letter-spacing: .18em; color: #A9A08A; text-transform: uppercase; }
   .rule i { width: 6px; height: 6px; background: var(--gold); transform: rotate(45deg); }
   /* the Patronus the app last told this phone about (Gringotts style only): a soft glow under the name */
   .pat { display: block; width: 120px; height: 67px; margin: 18px auto 0; fill: #E9F2F7; opacity: .55; filter: drop-shadow(0 0 10px #cfe6f3); animation: patGlow 2.6s ease-in-out infinite; }
@@ -236,9 +237,10 @@
 </div>
 <main id="setup" hidden>
   <div class="vault">
-    <div class="door-wrap"><img class="door" src="logo.svg" alt=""></div>
+    <div class="door-wrap"><img class="door" src="logo-still.svg" alt=""></div>
     <h1 class="word">Gringotts</h1>
     <div class="rule"><i></i></div>
+    <p class="goblins">Goblins at work</p>
   </div>
   <form id="f">
     <p class="hint">Paste your personal app link once. It stays on this phone only. To change it later, long-press the app icon and pick Change link.</p>
@@ -251,9 +253,10 @@
 </main>
 <main id="install" hidden>
   <div class="vault">
-    <div class="door-wrap"><img class="door" src="logo.svg" alt=""></div>
+    <div class="door-wrap"><img class="door" src="logo-still.svg" alt=""></div>
     <h1 class="word">Gringotts</h1>
     <div class="rule"><i></i></div>
+    <p class="goblins">Goblins at work</p>
   </div>
   <div style="margin-top:32px;text-align:center">
     <p class="hint" style="color:var(--text);font-size:1.05rem">Install Gringotts on this phone</p>
@@ -417,7 +420,11 @@
     later(function () { if (!done) { isReady = false; inRoom = true; if (!roomAt) roomAt = Date.now() - ROOM_MIN; ready('7 s limit'); } }, CAP);
     sp.addEventListener('click', function () { finish('tapped'); });   // tap to skip, at any point
     sp.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); finish('tapped'); } });
+    var apple = /iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Mac/.test(navigator.platform || ''));
     if (demo) later(function () { ready('demo'); }, demoM[1] ? Number(demoM[1]) : 2500);
+    // v7.40 (22 Nov iPad test): Safari never lets Google's sign-in into a frame, and a Home-screen app has its own sign-ins,
+    // so on iPhone/iPad the app opens as the whole page after the wheel's turn (Google's sign-in shows when needed).
+    else if (apple) later(function () { mark('whole page'); location.replace(withScreen(link, asked())); }, MIN);
     else {
       // The app says it is ready once Home has drawn its figures. Only a message of that type from Google's app pages counts.
       addEventListener('message', function (e) {

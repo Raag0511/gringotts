@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Frame test">
+<meta name="robots" content="noindex">
+<title>Frame test</title>
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+  html, body { margin: 0; height: 100%; background: #0E2620; color: #ECE6D8; font: 16px/1.55 -apple-system, system-ui, sans-serif; }
+  iframe { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; }
+  main { padding: calc(env(safe-area-inset-top) + 24px) 20px 40px; max-width: 460px; margin: 0 auto; }
+  h1 { color: #E2B54C; font-size: 1.3rem; margin: 0 0 10px; }
+  button { display: block; width: 100%; margin-top: 12px; min-height: 48px; border: 0; border-radius: 10px; background: #E2B54C; color: #2A1E05; font: 700 1rem system-ui, sans-serif; }
+  input { width: 100%; box-sizing: border-box; padding: 12px; border-radius: 10px; border: 1px solid #2c5547; background: #143329; color: #ECE6D8; font-size: 16px; }
+  #pill { position: fixed; z-index: 2; right: 10px; bottom: calc(env(safe-area-inset-bottom) + 10px); background: rgba(0,0,0,.7); color: #fff; font-size: 12px; padding: 4px 10px; border-radius: 12px; }
+  .muted { color: #C4BBA3; font-size: .93rem; }
+</style>
+</head>
+<body>
+<div id="pill"></div>
+<main id="setup" hidden>
+  <h1>Gringotts frame test</h1>
+  <p class="muted" id="where"></p>
+  <button type="button" id="copy" hidden>Copy the test link</button>
+  <p class="muted" id="copied"></p>
+  <input id="paste" placeholder="Paste the test link here" autocomplete="off">
+  <button type="button" id="pb">Paste</button>
+  <button type="button" id="go">Start the test</button>
+</main>
+<script>
+// Throwaway test page (22 Nov 2026), not part of Gringotts. The test link carries #app=<test page>&key=<test key>;
+// both are kept only on this device. The # part of a link is never sent to any server.
+(function () {
+  var standalone = navigator.standalone === true || matchMedia('(display-mode: standalone)').matches;
+  document.getElementById('pill').textContent = standalone ? 'Home-screen app' : 'Safari tab';
+  var parse = function (s) {
+    var h = String(s || '').split('#')[1] || '', q = new URLSearchParams(h), app = q.get('app') || '', key = q.get('key') || '';
+    return /^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(app) && /^[0-9a-f]{64}$/.test(key) ? { app: app, key: key } : null;
+  };
+  var get = function () { try { return JSON.parse(localStorage.getItem('frameTest') || 'null'); } catch (e) { return null; } };
+  var put = function (t) { try { localStorage.setItem('frameTest', JSON.stringify(t)); } catch (e) {} };
+  var t = parse(location.href);
+  if (t) put(t); else t = get();
+  var run = function (t) {
+    document.getElementById('setup').hidden = true;
+    addEventListener('message', function (e) {
+      if (!/^https:\/\/([a-z0-9-]+\.)*googleusercontent\.com$/.test(e.origin) || !e.data || e.data.type !== 'key?') return;
+      e.source.postMessage({ type: 'key', key: t.key }, e.origin);   // only to Google's page that asked
+    });
+    var f = document.createElement('iframe'); f.src = t.app; f.title = 'Frame test'; document.body.appendChild(f);
+  };
+  if (t && (standalone || !/iPhone|iPad|iPod/.test(navigator.userAgent) && !(navigator.maxTouchPoints > 1 && /Mac/.test(navigator.platform || '')))) { run(t); return; }
+  var s = document.getElementById('setup'), inp = document.getElementById('paste');
+  s.hidden = false;
+  document.getElementById('where').textContent = t
+    ? 'Step 1: tap Copy the test link. Step 2: tap Share, then Add to Home Screen. Step 3: open Frame test from the Home screen (tap Paste there if it asks). Or tap Start the test to try it in Safari first.'
+    : 'Paste the test link, then tap Start the test.';
+  if (t) {
+    var c = document.getElementById('copy'); c.hidden = false;
+    c.onclick = function () { navigator.clipboard.writeText(location.href.split('#')[0] + '#app=' + encodeURIComponent(t.app) + '&key=' + t.key).then(function () { document.getElementById('copied').textContent = '✓ Copied.'; }); };
+  }
+  document.getElementById('pb').onclick = function () { navigator.clipboard.readText().then(function (v) { inp.value = v; }); };
+  document.getElementById('go').onclick = function () { var p = parse(inp.value) || t; if (!p) { document.getElementById('copied').textContent = 'That isn’t the test link.'; return; } put(p); run(p); };
+})();
+</script>
+</body>
+</html>

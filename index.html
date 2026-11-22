@@ -244,6 +244,7 @@
     <p class="hint">Paste your personal app link once. It stays on this phone only. To change it later, long-press the app icon and pick Change link.</p>
     <label for="link">App link</label>
     <input id="link" type="url" inputmode="url" autocomplete="off" placeholder="https://script.google.com/…" required>
+    <button type="button" id="paste" hidden>Paste my vault key</button>
     <p class="err" id="err" role="alert"></p>
     <button type="submit">Open the vault</button>
   </form>
@@ -259,6 +260,8 @@
     <p class="hint">Gringotts lives on your Home screen like any app. Your vault's key is kept there, so this step can't be skipped.</p>
     <button type="button" id="inst" hidden>Install Gringotts</button>
     <p class="hint" id="instHow" hidden></p>
+    <button type="button" id="copyKey" hidden>Copy my vault key</button>
+    <p class="hint" id="copied" hidden style="color:var(--gold)"></p>
     <p class="hint" id="instDone" hidden style="color:var(--gold)">✓ Installed. Now open Gringotts from your Home screen: setup carries on there.</p>
   </div>
 </main>
@@ -329,6 +332,19 @@
     ins.hidden = false;
     how.textContent = ios ? 'In Safari, tap Share, then Add to Home Screen. Then open Gringotts from your Home screen.' : 'Tap Chrome\'s ⋮ menu, then Install app (or Add to Home screen). Then open Gringotts from your Home screen.';
     how.hidden = false;
+    if (ios) {
+      // An iPhone/iPad Home-screen app keeps its own storage, apart from Safari's: the key goes across by the clipboard.
+      // The link also stays in the address (a # part is never sent anywhere) in case the Home-screen app starts there.
+      history.replaceState(null, '', location.pathname + location.search + '#link=' + encodeURIComponent(link));
+      how.textContent = '1. Tap Copy my vault key.  2. Tap Share, then Add to Home Screen.  3. Open Gringotts from your Home screen and tap Paste my vault key.';
+      var ck = document.getElementById('copyKey'), cd = document.getElementById('copied'), key = link;
+      ck.hidden = false;
+      ck.onclick = function () {
+        var done = function () { cd.hidden = false; cd.textContent = '✓ Copied. Now tap Share, then Add to Home Screen.'; };
+        try { navigator.clipboard.writeText(key).then(done, function () { cd.hidden = false; cd.textContent = key; }); }
+        catch (e) { cd.hidden = false; cd.textContent = key; }
+      };
+    }
     addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); btn.hidden = false; how.hidden = true; btn.onclick = function () { e.prompt(); }; });
     addEventListener('appinstalled', function () { btn.hidden = true; how.hidden = true; document.getElementById('instDone').hidden = false; });
     link = '';   // nothing below opens the app
@@ -419,9 +435,16 @@
     var inp = document.getElementById('link');
     inp.value = link;
     inp.addEventListener('input', function () { document.getElementById('err').textContent = ''; });
+    // v7.40: the whole Gringotts link (…#link=…) is taken too; Paste reads the clipboard (copied on the install screen).
+    var keyOf = function (v) { var m = String(v || '').trim().match(/#link=([^&\s]+)/); if (m) { try { return decodeURIComponent(m[1]); } catch (e) {} } return String(v || '').trim(); };
+    var pb = document.getElementById('paste');
+    if (navigator.clipboard && navigator.clipboard.readText) {
+      pb.hidden = false;
+      pb.onclick = function () { navigator.clipboard.readText().then(function (v) { inp.value = keyOf(v); }, function () { document.getElementById('err').textContent = 'Couldn’t read the clipboard. Long-press the box and tap Paste.'; }); };
+    }
     document.getElementById('f').addEventListener('submit', function (e) {
       e.preventDefault();
-      var v = inp.value.trim();
+      var v = keyOf(inp.value);
       if (!/^https:\/\/[^\s]+$/.test(v)) { document.getElementById('err').textContent = 'The link must start with https://'; return; }
       try { localStorage.setItem(KEY, v); } catch (err) { document.getElementById('err').textContent = 'This browser would not save the link.'; return; }
       var q = asked().toString();   // keep the screen the first link asked for

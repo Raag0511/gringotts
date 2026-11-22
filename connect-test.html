@@ -20,9 +20,14 @@
   <p class="muted">Tests only the Connect step, against a test vault with no data. Your own macros and variables aren't touched: this uses gr_url and gr_secret only.</p>
   <p><b>1.</b> Add the Gringotts connect macro: tap, open it with MacroDroid, Save.</p>
   <a class="btn ghost" href="macros/gringotts-connect.macro">Gringotts connect macro</a>
-  <p><b>2.</b> Tap Connect. If Android asks, pick MacroDroid.</p>
-  <a class="btn" href="intent://gringotts.app/connect?c=gr~https://script.google.com/macros/s/AKfycbzFDz8kLwEaoNrOQugG6UyR_0DmgqXISGHfNWg4qK4BvVmONrB3RtXvYBgNMQo47xkH/exec~feedfacefeedfacefeedfacefeedface#Intent;scheme=https;package=com.arlosoft.macrodroid;S.browser_fallback_url=https%3A%2F%2Fraag0511.github.io%2Fgringotts%2Fmacrodroid.html;end">Connect</a>
+  <p><b>2.</b> Tap Connect. In the share list, pick <b>MacroDroid</b> (it may be called “Text shared to MacroDroid”).</p>
+  <button class="btn" style="border:0;width:100%;font-size:16px" onclick="go()">Connect</button>
+  <p id="m" class="muted"></p>
   <p><b>3.</b> Within a few seconds a notification should say <b>Gringotts connected</b>, and the Gringotts connect macro should switch itself off.</p>
 </main>
+<script>
+var CODE='gr~https://script.google.com/macros/s/AKfycbzFDz8kLwEaoNrOQugG6UyR_0DmgqXISGHfNWg4qK4BvVmONrB3RtXvYBgNMQo47xkH/exec~feedfacefeedfacefeedfacefeedface';
+function go(){var m=document.getElementById('m');if(navigator.share)navigator.share({text:CODE}).catch(function(e){m.textContent='Share stopped: '+e.message;});else m.textContent='This browser can’t share. Open this page in Chrome.';}
+</script>
 </body>
 </html>

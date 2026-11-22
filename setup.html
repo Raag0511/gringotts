@@ -25,6 +25,11 @@
   .btn { display: block; text-align: center; background: var(--gold); color: #1d1405; font-weight: 700; text-decoration: none; border-radius: 12px; padding: 13px; margin: 12px 0 4px; }
   .muted { color: var(--muted); font-size: .92rem; }
   .cost { color: var(--gold); }
+  [hidden] { display: none !important; }
+  .short { padding-left: 20px; margin: 4px 0; } .short li { margin: 4px 0; }
+  .perm { width: 100%; border-collapse: collapse; font-size: .92rem; margin: 6px 0 4px; } .perm td { padding: 6px 4px; border-top: 1px solid var(--line); vertical-align: top; } .perm td:first-child { color: var(--gold); font-weight: 700; width: 34%; }
+  .priv { border: 1px solid var(--gold); border-radius: 12px; padding: 10px 12px; margin: 12px 0 4px; background: rgba(226,181,76,.07); } .priv p { margin: 4px 0; } .priv b { color: var(--gold); }
+  details { margin-top: 8px; color: var(--muted); font-size: .94rem; } summary { color: var(--gold); cursor: pointer; font-weight: 700; } details ul { padding-left: 20px; }
   .ok { color: var(--ok); }
   a { color: var(--gold); }
 </style>
@@ -34,57 +39,96 @@
   <img src="logo-still.svg" alt="" width="64" height="64" style="display:block;margin:0 auto">
   <h1>GRINGOTTS</h1>
   <p class="goblins">Goblins at work</p>
-  <p class="lead">Your own expense tracker, running in your own Google account. Free, about 10 minutes, once.</p>
+  <p class="lead">Your own expense tracker, in your own Google account.<br>Free · about 10 minutes · once.</p>
 
   <div class="step">
-    <h2><span class="n">1</span>Before you start: Google will warn you, and that's expected</h2>
-    <div class="why">
-      <p>Gringotts is a small app that runs inside <b>your own</b> Google account. It isn't on Google's app store, so Google shows warnings for it. Here is what you'll see, and why it's fine:</p>
-      <ul>
-        <li><b>"Google hasn't verified this app."</b> Google shows this for every app that isn't on its store. Tap <b>Advanced</b>, then <b>Go to Gringotts (unsafe)</b>. "Unsafe" is Google's standard word for any unverified app, not a finding about this one.</li>
-        <li><b>A long list of permissions.</b> The app needs each one: it reads your bank SMS into your sheet, reads card statement emails in your Gmail, sends you a morning email, keeps a weekly backup in your Drive, and sets up its own links ("Apps Script projects").</li>
-        <li><b>Your data stays yours.</b> Everything is kept in your own Google Sheet and Drive. Nothing is sent to anyone else. You can see or remove the app's access any time in your Google Account, under Security, "Your connections to third-party apps".</li>
-        <li><b>Updates come from the person who shared Gringotts with you, but they can't see your data.</b> Once a day your app checks for a new release they have published and moves to it by itself. They can't open your sheet, and nothing you enter passes through their account. Nobody but them can change the shared code, and you only ever get a finished release. Like any app that updates itself, it works on trust, so it's best set up with someone you know.</li>
-      </ul>
+    <h2><span class="n">1</span>Google will warn you. That's fine.</h2>
+    <p>"Google hasn't verified this app" → tap <b>Advanced</b> › <b>Go to Gringotts</b>.</p>
+    <p style="margin-top:12px"><b>Then Google lists permissions. Some sound alarming. Here's what each is for.</b></p>
+    <p class="muted">What Google says, and what Gringotts does with it:</p>
+    <table class="perm">
+      <tr><td>Your Google Sheets</td><td>your expenses, kept in your own sheet</td></tr>
+      <tr><td>Your Google Drive</td><td>a weekly backup of that sheet, and your card statements, in your own Drive</td></tr>
+      <tr><td>Gmail: read, send and delete</td><td>reads only your card statement emails and files them, and its own morning email, under a label. It never deletes or sends anything from Gmail</td></tr>
+      <tr><td>Send email as you</td><td>your morning summary, from you to you</td></tr>
+      <tr><td>Connect to an external service</td><td>receives your bank SMS from your phone, and checks for updates</td></tr>
+      <tr><td>Run when you are not there</td><td>the 8 am summary and the nightly checks</td></tr>
+      <tr><td>Apps Script projects</td><td>makes your app's own links, once, at setup</td></tr>
+      <tr><td>Your email address</td><td>to know it's you</td></tr>
+      <tr><td>Show in Google Sheets</td><td>the Gringotts menu in your sheet</td></tr>
+    </table>
+    <div class="priv">
+      <b>🔒 Your privacy</b>
+      <p>Only you can see your data. Not the person who shared Gringotts, not anyone else.</p>
+      <p>Nothing leaves your Google account, except feedback you choose to send.</p>
+      <p>You can remove Gringotts' access any time.</p>
     </div>
+    <details><summary>Read more about your privacy</summary>
+      <ul>
+        <li><b>The warning:</b> Google shows it for every app that isn't on its store. "Unsafe" is Google's standard word for any unverified app, not a finding about this one.</li>
+        <li><b>Your data:</b> everything is kept in your own Google Sheet and Drive. Nothing is sent to anyone else. To see or remove the app's access: Google Account › Security › "Your connections to third-party apps".</li>
+        <li><b>Updates:</b> they come from the person who shared Gringotts with you, but they can't see your data. Once a day your app moves to their latest release by itself. They can't open your sheet, and nothing you enter passes through their account. Like any app that updates itself, it works on trust, so set it up with someone you know.</li>
+      </ul>
+    </details>
   </div>
 
   <div class="step">
-    <h2><span class="n">2</span>Make your own copy</h2>
-    <p>This copies the Gringotts sheet, and the app inside it, into your Google Drive. Use the Google account you want to keep your expenses in.</p>
-    <!-- shortcut: the copy link is added once the template sheet exists (plan Step 2); until then this button is hidden -->
-    <a class="btn" id="copy" href="#" hidden>Make my copy</a>
-    <p class="muted" id="nocopy">The copy link is being prepared. Ask the person who shared Gringotts for it.</p>
-  </div>
-
-  <div class="step">
-    <h2><span class="n">3</span>In your copy: Gringotts › Set up</h2>
-    <p>Open your copy. In the menu at the top, tap <b>Gringotts</b>, then <b>Set up</b>. Google asks for permission (step 1 says what you'll see). The app then makes its tabs and its daily checks.</p>
-  </div>
-
-  <div class="step">
-    <h2><span class="n">4</span>One switch, then your links</h2>
-    <p>Set up shows a box with a link: turn on <b>Google Apps Script API</b> there, come back, and tap <b>It's on: make my links</b>. The app makes its own links. Then the box shows a <b>QR code</b> and a <b>setup code</b>.</p>
-  </div>
-
-  <div class="step">
-    <h2><span class="n">5</span>On your phone</h2>
-    <ul>
-      <li><b>Scan the QR code.</b> Gringotts opens with your own link. Add it to your Home screen (Chrome: ⋮ › Add to Home screen; iPhone or iPad Safari: Share › Add to Home Screen).</li>
-      <li><b>Android:</b> install <b>MacroDroid</b> from the Play Store, import the Gringotts macro, and paste your setup code when it asks. Tap <b>Send a test</b>: Gringotts shows <span class="ok">Phone connected ✓</span>.
-        <p class="muted"><span class="cost">Optional but recommended:</span> MacroDroid's free version works, but it needs you to watch an ad now and then to keep running. <b>MacroDroid Pro</b> (about ₹250, once, bought inside MacroDroid) runs without ads. Recommended, not required.</p></li>
-      <li><b>iPhone:</b> set up one Shortcuts automation per bank (guide to follow). An iPhone can't read older SMS, so card statements from Gmail fill any gaps.</li>
+    <h2><span class="n">2</span>Before you start</h2>
+    <ul class="short">
+      <li class="os-android os-computer"><b>Android:</b> get MacroDroid (free). It passes your bank SMS to Gringotts.
+        <a class="btn" href="https://play.google.com/store/apps/details?id=com.arlosoft.macrodroid">Get MacroDroid</a></li>
+      <li>Use <b>one</b> Google account throughout.</li>
+      <li>Google asks for permission <b>twice</b>. Both times it's you, allowing your own copy.</li>
     </ul>
+    <details><summary>More</summary>
+      <p>Signed in to more than one Google account? Open this page in the account that will own your vault, or in a private / Incognito window with just that account.</p>
+    </details>
   </div>
 
   <div class="step">
-    <h2><span class="n">6</span>Open Gringotts</h2>
-    <p>A Welcome card asks your name and style. Your cards appear by themselves: each one is offered when its first SMS arrives, and its statement layout is learned from its first statement.</p>
+    <h2><span class="n">3</span>Open your vault</h2>
+    <p>The setup page builds your sheet and your app. You'll turn on one Google switch; it shows you where.</p>
+    <a class="btn" id="copy" href="#" hidden>Open the setup page</a>
+    <p class="muted" id="nocopy">The setup link is being prepared. Ask the person who shared Gringotts for it.</p>
+  </div>
+
+  <div class="step">
+    <h2><span class="n">4</span>Install it on your phone</h2>
+    <p class="os-computer muted">On a computer? Scan the setup page's QR code with your phone.</p>
+    <div class="os-android os-computer">
+      <p class="os-computer"><b>Android</b></p>
+      <p>Tap <b>Install</b>, then open Gringotts from your Home screen.</p>
+    </div>
+    <div class="os-apple os-computer">
+      <p class="os-computer"><b>iPhone / iPad</b></p>
+      <ol class="short">
+        <li><b>Copy my vault key</b></li>
+        <li>Share › <b>Add to Home Screen</b></li>
+        <li>Open Gringotts › <b>Paste my vault key</b></li>
+      </ol>
+    </div>
+    <p class="muted">Google may ask you to sign in once more. That's normal.</p>
+  </div>
+
+  <div class="step">
+    <h2><span class="n">5</span>Welcome, then connect</h2>
+    <p>Pick your goblin, name, look and extras.</p>
+    <p class="os-android os-computer"><b>Android:</b> Settings › <b>Connect this phone</b>. Bank SMS then arrive by themselves.</p>
+    <p class="os-apple os-computer"><b>iPhone:</b> SMS come later. Add spends yourself for now.</p>
+    <details><summary>More</summary>
+      <p class="os-android os-computer">Connect: add the three Gringotts macros to MacroDroid, tap Connect and pick MacroDroid. A notification says <span class="ok">Gringotts connected</span>. <span class="cost">Optional:</span> MacroDroid Pro (about ₹250, once) runs without ads.</p>
+      <p class="os-apple os-computer">On iPhone, card statements from Gmail fill in what you don't add.</p>
+      <p>Your cards appear by themselves: each is offered when its first SMS arrives, and its statement layout is learned from its first statement.</p>
+    </details>
   </div>
 </main>
 <script>
   // the copy link, once the template sheet exists: https://docs.google.com/spreadsheets/d/<template id>/copy
   var COPY = 'https://script.google.com/macros/s/AKfycbylqZjNsmsRlFrWLCu5nkRYg7QLjvVl6FaPutkLKedGYXqcZV6FQM7Ezc2Gyd0UipxN/exec';
+  // only the steps for this device: Android, iPhone/iPad (an iPad says it's a Mac), or a computer (both)
+  var ua = navigator.userAgent, apple = /iPhone|iPad|iPod/i.test(ua) || (navigator.maxTouchPoints > 1 && /Mac/.test(navigator.platform || '')),
+    os = /Android/i.test(ua) ? 'android' : apple ? 'apple' : 'computer';
+  Array.prototype.forEach.call(document.querySelectorAll('[class*="os-"]'), function (e) { if (!e.classList.contains('os-' + os)) e.hidden = true; });
   if (COPY) { var c = document.getElementById('copy'); c.href = COPY; c.hidden = false; document.getElementById('nocopy').hidden = true; }
 </script>
 </body>

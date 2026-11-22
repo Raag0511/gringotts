@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0E2620">
+<title>Get Gringotts</title>
+<link rel="icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&display=swap">
+<style>
+  :root { --bg: #0E2620; --card: #143329; --line: #24493d; --gold: #E2B54C; --text: #ECE6D8; --muted: #A9A08A; --ok: #8FD3A8; }
+  html, body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.55 system-ui, sans-serif; }
+  main { max-width: 620px; margin: 0 auto; padding: 28px 16px 48px; }
+  h1 { font: 800 1.9rem/1.1 Cinzel, Georgia, serif; letter-spacing: .12em; color: var(--gold); text-align: center; margin: 8px 0 6px; }
+  .lead { text-align: center; color: var(--muted); margin: 0 0 22px; }
+  .step { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px; margin: 14px 0; }
+  .step h2 { font-size: 1.05rem; margin: 0 0 6px; display: flex; gap: 10px; align-items: baseline; }
+  .n { flex: none; width: 26px; height: 26px; border-radius: 50%; background: var(--gold); color: #1d1405; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; font-size: .9rem; }
+  .step p, .step li { margin: 6px 0; }
+  .step ul { padding-left: 20px; margin: 6px 0; }
+  .why { border-left: 3px solid var(--gold); padding: 2px 0 2px 12px; margin: 10px 0; }
+  .btn { display: block; text-align: center; background: var(--gold); color: #1d1405; font-weight: 700; text-decoration: none; border-radius: 12px; padding: 13px; margin: 12px 0 4px; }
+  .muted { color: var(--muted); font-size: .92rem; }
+  .cost { color: var(--gold); }
+  .ok { color: var(--ok); }
+  a { color: var(--gold); }
+</style>
+</head>
+<body>
+<main>
+  <h1>GRINGOTTS</h1>
+  <p class="lead">Your own expense tracker, running in your own Google account. Free, about 10 minutes, once.</p>
+
+  <div class="step">
+    <h2><span class="n">1</span>Before you start: Google will warn you, and that's expected</h2>
+    <div class="why">
+      <p>Gringotts is a small app that runs inside <b>your own</b> Google account. It isn't on Google's app store, so Google shows warnings for it. Here is what you'll see, and why it's fine:</p>
+      <ul>
+        <li><b>"Google hasn't verified this app."</b> Google shows this for every app that isn't on its store. Tap <b>Advanced</b>, then <b>Go to Gringotts (unsafe)</b>. "Unsafe" is Google's standard word for any unverified app, not a finding about this one.</li>
+        <li><b>A long list of permissions.</b> The app needs each one: it reads your bank SMS into your sheet, reads card statement emails in your Gmail, sends you a morning email, keeps a weekly backup in your Drive, and sets up its own links ("Apps Script projects").</li>
+        <li><b>Your data stays yours.</b> Everything is kept in your own Google Sheet and Drive. Nothing is sent to anyone else. You can see or remove the app's access any time in your Google Account, under Security, "Your connections to third-party apps".</li>
+        <li><b>Updates come from the person who shared Gringotts with you, but they can't see your data.</b> Once a day your app checks for a new release they have published and moves to it by itself. They can't open your sheet, and nothing you enter passes through their account. Nobody but them can change the shared code, and you only ever get a finished release. Like any app that updates itself, it works on trust, so it's best set up with someone you know.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="step">
+    <h2><span class="n">2</span>Make your own copy</h2>
+    <p>This copies the Gringotts sheet, and the app inside it, into your Google Drive. Use the Google account you want to keep your expenses in.</p>
+    <!-- shortcut: the copy link is added once the template sheet exists (plan Step 2); until then this button is hidden -->
+    <a class="btn" id="copy" href="#" hidden>Make my copy</a>
+    <p class="muted" id="nocopy">The copy link is being prepared. Ask the person who shared Gringotts for it.</p>
+  </div>
+
+  <div class="step">
+    <h2><span class="n">3</span>In your copy: Gringotts › Set up</h2>
+    <p>Open your copy. In the menu at the top, tap <b>Gringotts</b>, then <b>Set up</b>. Google asks for permission (step 1 says what you'll see). The app then makes its tabs and its daily checks.</p>
+  </div>
+
+  <div class="step">
+    <h2><span class="n">4</span>One switch, then your links</h2>
+    <p>Set up shows a box with a link: turn on <b>Google Apps Script API</b> there, come back, and tap <b>It's on: make my links</b>. The app makes its own links. Then the box shows a <b>QR code</b> and a <b>setup code</b>.</p>
+  </div>
+
+  <div class="step">
+    <h2><span class="n">5</span>On your phone</h2>
+    <ul>
+      <li><b>Scan the QR code.</b> Gringotts opens with your own link. Add it to your Home screen (Chrome: ⋮ › Add to Home screen; iPhone or iPad Safari: Share › Add to Home Screen).</li>
+      <li><b>Android:</b> install <b>MacroDroid</b> from the Play Store, import the Gringotts macro, and paste your setup code when it asks. Tap <b>Send a test</b>: Gringotts shows <span class="ok">Phone connected ✓</span>.
+        <p class="muted"><span class="cost">Optional but recommended:</span> MacroDroid's free version works, but it needs you to watch an ad now and then to keep running. <b>MacroDroid Pro</b> (about ₹250, once, bought inside MacroDroid) runs without ads. Recommended, not required.</p></li>
+      <li><b>iPhone:</b> set up one Shortcuts automation per bank (guide to follow). An iPhone can't read older SMS, so card statements from Gmail fill any gaps.</li>
+    </ul>
+  </div>
+
+  <div class="step">
+    <h2><span class="n">6</span>Open Gringotts</h2>
+    <p>A Welcome card asks your name and style. Your cards appear by themselves: each one is offered when its first SMS arrives, and its statement layout is learned from its first statement.</p>
+  </div>
+</main>
+<script>
+  // the copy link, once the template sheet exists: https://docs.google.com/spreadsheets/d/<template id>/copy
+  var COPY = 'https://script.google.com/macros/s/AKfycbylqZjNsmsRlFrWLCu5nkRYg7QLjvVl6FaPutkLKedGYXqcZV6FQM7Ezc2Gyd0UipxN/exec';
+  if (COPY) { var c = document.getElementById('copy'); c.href = COPY; c.hidden = false; document.getElementById('nocopy').hidden = true; }
+</script>
+</body>
+</html>

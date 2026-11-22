@@ -248,6 +248,20 @@
     <button type="submit">Open the vault</button>
   </form>
 </main>
+<main id="install" hidden>
+  <div class="vault">
+    <div class="door-wrap"><img class="door" src="logo.svg" alt=""></div>
+    <h1 class="word">Gringotts</h1>
+    <div class="rule"><i></i></div>
+  </div>
+  <div style="margin-top:32px;text-align:center">
+    <p class="hint" style="color:var(--text);font-size:1.05rem">Install Gringotts on this phone</p>
+    <p class="hint">Gringotts lives on your Home screen like any app. Your vault's key is kept there, so this step can't be skipped.</p>
+    <button type="button" id="inst" hidden>Install Gringotts</button>
+    <p class="hint" id="instHow" hidden></p>
+    <p class="hint" id="instDone" hidden style="color:var(--gold)">✓ Installed. Now open Gringotts from your Home screen: setup carries on there.</p>
+  </div>
+</main>
 <script>
   var KEY = 'expenseAppLink';
   function saved() { try { return localStorage.getItem(KEY) || ''; } catch (e) { return ''; } }
@@ -305,6 +319,21 @@
     try { localStorage.setItem(KEY, v); } catch (e) {}
   })();
   var link = saved();
+  // v7.40: on a phone, Gringotts opens only once installed (from the Home screen). In a phone's browser tab with a link
+  // saved, the install screen shows instead and can't be skipped. Links from the morning email (?tab, ?card, ?row) and
+  // computers are never stopped. Android: Chrome's own install box; iPhone/iPad: Share › Add to Home Screen.
+  var standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  var phone = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Mac/.test(navigator.platform || ''));
+  if (link && phone && !standalone && !/[?&](change|demo|tab|card|row|c)\b/.test(location.search)) {
+    var ins = document.getElementById('install'), btn = document.getElementById('inst'), how = document.getElementById('instHow'), ios = /iPhone|iPad|iPod|Mac/i.test(navigator.userAgent);
+    ins.hidden = false;
+    how.textContent = ios ? 'In Safari, tap Share, then Add to Home Screen. Then open Gringotts from your Home screen.' : 'Tap Chrome\'s ⋮ menu, then Install app (or Add to Home screen). Then open Gringotts from your Home screen.';
+    how.hidden = false;
+    addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); btn.hidden = false; how.hidden = true; btn.onclick = function () { e.prompt(); }; });
+    addEventListener('appinstalled', function () { btn.hidden = true; how.hidden = true; document.getElementById('instDone').hidden = false; });
+    link = '';   // nothing below opens the app
+  }
+  var installing = !document.getElementById('install').hidden;
   // ?demo plays the opening with a pretend load and no app: ?demo (2.5 s), ?demo=700 (fast), ?demo=5000 (vault room)
   var demoM = location.search.match(/[?&]demo(?:=(\d{1,5}))?\b/), demo = !!demoM;
   if ((link || demo) && !/[?&]change\b/.test(location.search)) {
@@ -385,7 +414,7 @@
       fr.addEventListener('load', function () { later(function () { ready('frame loaded'); }, 2500); });   // fallback: an app without the message
       document.body.insertBefore(fr, sp);
     }
-  } else {
+  } else if (!installing) {
     document.getElementById('setup').hidden = false;
     var inp = document.getElementById('link');
     inp.value = link;

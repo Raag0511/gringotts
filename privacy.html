@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0E2620">
+<title>Gringotts privacy</title>
+<link rel="icon" href="icon-192.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&display=swap">
+<style>
+  :root { --bg: #0E2620; --card: #143329; --line: #24493d; --gold: #E2B54C; --text: #ECE6D8; --muted: #A9A08A; }
+  html, body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.55 system-ui, sans-serif; }
+  main { max-width: 620px; margin: 0 auto; padding: 28px 16px 48px; }
+  h1 { font: 800 1.6rem/1.15 Cinzel, Georgia, serif; letter-spacing: .1em; color: var(--gold); text-align: center; margin: 8px 0 4px; }
+  .lead { text-align: center; color: var(--muted); margin: 0 0 20px; }
+  .step { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px; margin: 14px 0; }
+  .step h2 { font-size: 1.05rem; margin: 0 0 6px; }
+  .step p, .step li { margin: 6px 0; }
+  .step ul { padding-left: 20px; margin: 6px 0; }
+  .perm { width: 100%; border-collapse: collapse; font-size: .92rem; margin: 6px 0 4px; } .perm td { padding: 6px 4px; border-top: 1px solid var(--line); vertical-align: top; } .perm td:first-child { color: var(--gold); font-weight: 700; width: 34%; }
+  .muted { color: var(--muted); font-size: .92rem; }
+  a { color: var(--gold); }
+</style>
+</head>
+<body>
+<main>
+  <img src="logo-still.svg" alt="" width="56" height="56" style="display:block;margin:0 auto">
+  <h1>Gringotts privacy</h1>
+  <p class="lead">Last updated 22 November 2026</p>
+
+  <div class="step">
+    <h2>In short</h2>
+    <ul>
+      <li>Your data stays in your own Google account. Nobody else can see it, including the person who shared Gringotts with you.</li>
+      <li>There are no Gringotts servers, no analytics and no advertising. Nothing is sold.</li>
+      <li>You can remove Gringotts' access, or delete everything, at any time.</li>
+    </ul>
+  </div>
+
+  <div class="step">
+    <h2>Who makes Gringotts</h2>
+    <p>Gringotts is a personal expense tracker made by one person and shared with family and friends. It is not a company or a commercial service.</p>
+  </div>
+
+  <div class="step">
+    <h2>Where your data lives</h2>
+    <p>When you set Gringotts up, it makes a Google Sheet and a small app (an Apps Script project) in <b>your own</b> Google account. The app runs as you, inside Google. Your expenses, cards, notes and settings are kept only in that sheet and its settings, in your own Drive.</p>
+    <p>Your bank SMS go from your phone (through MacroDroid on Android) straight to your own app's link. They are not sent anywhere else.</p>
+  </div>
+
+  <div class="step">
+    <h2>What Google asks you to allow, and why</h2>
+    <p class="muted">In Google's words, and what Gringotts does with each.</p>
+    <table class="perm">
+      <tr><td>Your Google Sheets</td><td>keeps your expenses in your own sheet</td></tr>
+      <tr><td>Your Google Drive</td><td>a weekly backup of that sheet, and your card statements, in your own Drive</td></tr>
+      <tr><td>Gmail: read, send and delete</td><td>searches only for your card statement emails, reads them, and files them, and its own morning email, under a label. It never deletes or sends anything from Gmail</td></tr>
+      <tr><td>Send email as you</td><td>your morning summary, from you to you</td></tr>
+      <tr><td>Connect to an external service</td><td>receives your bank SMS from your phone, and reads the public Gringotts release note for updates</td></tr>
+      <tr><td>Run when you are not there</td><td>the morning summary, the nightly checks and the daily update</td></tr>
+      <tr><td>Apps Script projects</td><td>makes your app and its links at setup, and moves it to a new release</td></tr>
+      <tr><td>Your email address</td><td>to know it's you</td></tr>
+      <tr><td>Show in Google Sheets</td><td>the Gringotts menu in your sheet</td></tr>
+    </table>
+    <p class="muted">Gringotts' use of information received from Google APIs follows the <a href="https://developers.google.com/terms/api-services-user-data-policy">Google API Services User Data Policy</a>, including the Limited Use requirements.</p>
+  </div>
+
+  <div class="step">
+    <h2>What leaves your account</h2>
+    <ul>
+      <li><b>Feedback you choose to send</b> (Settings › Send feedback) goes to a Google Form read by the person who shared Gringotts. Only what you type is sent.</li>
+      <li>Nothing else. No usage data, no crash reports, no copies of your entries.</li>
+    </ul>
+  </div>
+
+  <div class="step">
+    <h2>Updates</h2>
+    <p>Once a day, the Gringotts setup app (running as you) checks the public release note and, if there is a new version, moves your app to it. An update only brings new app code. It never sends your data anywhere, and the person who publishes updates cannot see your sheet. A release that needs a new permission waits until you allow it.</p>
+  </div>
+
+  <div class="step">
+    <h2>Removing access, and deleting everything</h2>
+    <ul>
+      <li><b>Remove access:</b> Google Account › Security › "Your connections to third-party apps & services" › remove each Gringotts entry (there can be two: the setup page and your own app). Gringotts stops at once.</li>
+      <li><b>Delete everything:</b> delete the "Gringotts" sheet from your Drive (the app inside it goes with it), then empty your Drive bin. Nothing is kept anywhere else.</li>
+    </ul>
+  </div>
+
+  <div class="step">
+    <h2>Contact</h2>
+    <p>Questions about Gringotts or this page: <a href="mailto:gringotts-help@googlegroups.com">gringotts-help@googlegroups.com</a></p>
+  </div>
+
+  <p class="muted" style="text-align:center"><a href="setup.html">Get Gringotts</a></p>
+</main>
+</body>
+</html>

@@ -452,6 +452,19 @@
       fr.allow = 'clipboard-read; clipboard-write';
       fr.addEventListener('load', function () { later(function () { ready('frame loaded'); }, 2500); });   // fallback: an app without the message
       document.body.insertBefore(fr, sp);
+      // v7.40.3 (22 Nov Incognito test): a browser that blocks Google's cookies inside a frame (Incognito, Safari, Brave)
+      // gets Google's "401 malformed" page instead of the app. No ready signal 8 s after the frame loads: offer the whole page.
+      var cameIn = false, wb = null;
+      addEventListener('message', function (e) { if (/^https:\/\/([a-z0-9-]+\.)*googleusercontent\.com$/.test(e.origin) && e.data && e.data.type === 'gringotts-ready') { cameIn = true; if (wb) wb.remove(); } });
+      fr.addEventListener('load', function () { setTimeout(function () {
+        if (cameIn || wb || demo) return; mark('offer whole page');
+        wb = document.createElement('div'); wb.id = 'wholePage'; wb.setAttribute('role', 'alert');
+        wb.style.cssText = 'position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:9;max-width:440px;margin:0 auto;background:#0E2620;color:#ECE6D8;border:1px solid #E2B54C;border-radius:14px;padding:14px;font:15px/1.45 system-ui,sans-serif;box-shadow:0 8px 30px rgba(0,0,0,.45)';
+        wb.innerHTML = '<b style="color:#E2B54C">Gringotts didn’t open here?</b><div style="margin:4px 0 10px;color:#C4BBA3;font-size:14px">This browser blocks Google’s sign-in inside the app (Incognito does this). Open Gringotts as a whole page instead.</div>' +
+          '<a id="wpGo" style="display:block;text-align:center;background:#E2B54C;color:#1d1405;font-weight:800;text-decoration:none;border-radius:12px;padding:12px" href="#">Open as a whole page</a>';
+        document.body.appendChild(wb);
+        document.getElementById('wpGo').onclick = function (ev) { ev.preventDefault(); location.replace(withScreen(trust && apple ? trust.ph : link, asked())); };
+      }, 8000); });
     }
   } else if (!installing) {
     document.getElementById('setup').hidden = false;

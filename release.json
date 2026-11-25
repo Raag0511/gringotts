@@ -1,9 +1,9 @@
 {
-  "app": "7.42.1",
+  "app": "7.42.2",
   "published": "2026-11-25",
   "library": {
     "id": "1CF8u-RoFvJJdlVo9Dg20JbdMMiWlRh5vXvMVtNuxUDaAPKRc6qYTp8IW",
-    "version": 10
+    "version": 11
   },
   "wrapper": "// Gringotts — your own copy (v7.40). All the app's code is the shared Gringotts library (\"G\"). This file hands the\n// library this copy's own settings, memory, lock and timers on every run, so nothing of yours is ever mixed with\n// anyone else's, and nobody else can see it. Please don't edit: updates replace this file.\n\nfunction host_() {\n  return { props: PropertiesService.getScriptProperties(), cache: CacheService.getScriptCache(), lock: LockService.getScriptLock(), app: ScriptApp };\n}\nfunction run_(name, args) { G.useHost(host_()); return G[name].apply(null, args || []); }\n\n// the web app (the page and the phone's SMS) and the page's calls\nfunction doGet(e) { return run_('doGet', [e]); }\nfunction doPost(e) { return run_('doPost', [e]); }\nfunction api(name, args) { return run_('api', [name, args]); }\n\n// the sheet\nfunction onOpen(e) { run_('onOpen', [e]); }\nfunction onEdit(e) { if (e && e.range) run_('onEdit', [e]); }\nfunction menuSetUp() { run_('menuSetUp', []); }\nfunction menuFinish() { run_('menuFinish', []); }\nfunction setupFinish() { return run_('setupFinish', []); }   // the Set up dialog's button\n\n// the timers the app sets up (they hand nothing back: a page can call any function in this file)\nfunction healthCheck(e) { run_('healthCheck', [e]); }\nfunction weeklyBackup(e) { run_('weeklyBackup', [e]); }\nfunction statementScan(e) { run_('statementScan', [e]); }\nfunction warmScreens(e) { run_('warmScreens', [e]); }\n",
   "scopes": [
@@ -18,6 +18,6 @@
     "https://www.googleapis.com/auth/script.projects",
     "https://www.googleapis.com/auth/script.deployments"
   ],
-  "notes": "Bills from Gmail: Rapido and UPI cabs, PDFs in Drive with View, BookMyShow and District tickets, wrong bills fixed",
+  "notes": "Bills from Gmail: cut addresses joined, close-amount tickets and District meals, older ones looked at again",
   "feedback": "https://docs.google.com/forms/d/e/1FAIpQLSd0S0HzpxCynk5vcIi48ZagBJt-wOVo_V4IUu5iKpgUf2Na5w/viewform?usp=pp_url&entry.117928420=TYPE&entry.1109037=TEXT&entry.1634512070=VERSION"
 }

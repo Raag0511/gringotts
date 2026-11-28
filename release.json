@@ -1,9 +1,9 @@
 {
-  "app": "7.45.0",
+  "app": "7.45.1",
   "published": "2026-11-28",
   "library": {
     "id": "1CF8u-RoFvJJdlVo9Dg20JbdMMiWlRh5vXvMVtNuxUDaAPKRc6qYTp8IW",
-    "version": 15
+    "version": 16
   },
   "wrapper": "// Gringotts — your own copy (v7.40). All the app's code is the shared Gringotts library (\"G\"). This file hands the\n// library this copy's own settings, memory, lock and timers on every run, so nothing of yours is ever mixed with\n// anyone else's, and nobody else can see it. Please don't edit: updates replace this file.\n\nfunction host_() {\n  return { props: PropertiesService.getScriptProperties(), cache: CacheService.getScriptCache(), lock: LockService.getScriptLock(), app: ScriptApp };\n}\nfunction run_(name, args) { G.useHost(host_()); return G[name].apply(null, args || []); }\n\n// the web app (the page and the phone's SMS) and the page's calls\nfunction doGet(e) { return run_('doGet', [e]); }\nfunction doPost(e) { return run_('doPost', [e]); }\nfunction api(name, args) { return run_('api', [name, args]); }\nfunction timed(name, args, once) { return run_('timed', [name, args, once]); }   // the same door, timed for the Speed log (v7.42.3); once: a save sent again isn't made twice (v7.43.2, #54)\n\n// the sheet\nfunction onOpen(e) { run_('onOpen', [e]); }\nfunction onEdit(e) { if (e && e.range) run_('onEdit', [e]); }\nfunction menuSetUp() { run_('menuSetUp', []); }\nfunction menuFinish() { run_('menuFinish', []); }\nfunction setupFinish() { return run_('setupFinish', []); }   // the Set up dialog's button\n\n// the timers the app sets up (they hand nothing back: a page can call any function in this file). v7.43.2 (#55): each runs\n// only for one of this copy's own timers (its id) or for you, signed in; a page with no sign-in can't start them.\nfunction timer_(e) {\n  const id = e && e.triggerUid;\n  if (id) return ScriptApp.getProjectTriggers().some(t => t.getUniqueId() === String(id));\n  try { const me = Session.getEffectiveUser().getEmail(); return !!me && Session.getActiveUser().getEmail() === me; } catch (err) { return false; }\n}\nfunction healthCheck(e) { if (timer_(e)) run_('healthCheck', [e]); }\nfunction weeklyBackup(e) { if (timer_(e)) run_('weeklyBackup', [e]); }\nfunction statementScan(e) { if (timer_(e)) run_('statementScan', [e]); }\nfunction warmScreens(e) { if (timer_(e)) run_('warmScreens', [e]); }\n",
   "scopes": [
@@ -18,6 +18,6 @@
     "https://www.googleapis.com/auth/script.projects",
     "https://www.googleapis.com/auth/script.deployments"
   ],
-  "notes": "Prepaid cards: who tops it up (employer or you), a Prepaid cards section on Cards, card names you can change; safer daily updates",
+  "notes": "Activity: a day's total no longer counts money in or prepaid balance; clearer names when an SMS has no merchant",
   "feedback": "https://docs.google.com/forms/d/e/1FAIpQLSd0S0HzpxCynk5vcIi48ZagBJt-wOVo_V4IUu5iKpgUf2Na5w/viewform?usp=pp_url&entry.117928420=TYPE&entry.1109037=TEXT&entry.1634512070=VERSION"
 }
